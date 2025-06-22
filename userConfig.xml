@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+
+<!-- Keybinds -->
+<keybinds>
+	<bind function="MOVE_FORWARD" key="KEY_W" />
+	<bind function="MOVE_BACKWARD" key="KEY_S" />
+	<bind function="MOVE_LEFT" key="KEY_A" />
+	<bind function="MOVE_RIGHT" key="KEY_D" />
+	<bind function="MOVE_JUMP" key="KEY_SPACE" />
+	<bind function="MOVE_CROUCH" key="KEY_LEFT_CONTROL" />
+	<bind function="MOVE_SPRINT" key="KEY_LEFT_SHIFT" />
+
+	<bind function="USE_INTERACT" key="KEY_E" />
+	<bind function="USE_HEADLAMP" key="KEY_F" />
+	<bind function="USE_VIEWZOOM" key="KEY_C" />
+
+	<bind function="META_SCREENSHOT" key="KEY_F10" />
+	<bind function="META_RELOAD_STAGE" key="KEY_F5" />
+	<bind function="META_RELOAD_ENV" key="KEY_F4" />
+	<bind function="META_EXIT" key="KEY_ESCAPE" />
+	<bind function="META_FREECURSOR" key="KEY_1" />
+</keybinds>
+
+
+<!-- Configs -->
+<config>
+	<option function="TURN_SPEED_MOUSE" value="0.125" />
+	<option function="TURN_SPEED_KEYBOARD" value="1.0" />
+
+	<option function="VIEW_VSYNC" value="FALSE" />
+	<option function="VIEW_MAX_FREQ" value="75.0" />
+	<option function="VIEW_FOV" value="70.0" />
+
+	<option function="META_DEBUG_MODE" value="NONE" />
+	<option function="META_SHOW_FRAMERATE_CONSOLE" value="FALSE" />
+	<option function="META_SHOW_DT_CONSOLE" value="FALSE" />
+	<option function="META_SHOW_CONSOLE" value="TRUE" />
+	<option function="META_STAGE_NAME" value="test" />
+</config>
