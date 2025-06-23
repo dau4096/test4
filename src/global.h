@@ -56,11 +56,11 @@ struct StageData {
 	glm::vec2 playerStartAngle;
 
 	float gravity;
-
+	float killPlaneZ;
 
 	StageData()
 		: name("<NONE>"), filePath(""),
-		  playerStartPoint(0.0f, 0.0f, 0.0f), playerStartAngle(0.0f, 0.0f), gravity(0.486f) {}
+		  playerStartPoint(0.0f, 0.0f, 0.0f), playerStartAngle(0.0f, 0.0f), gravity(0.486f), killPlaneZ(-16.0f) {}
 };
 
 inline StageData stageData;

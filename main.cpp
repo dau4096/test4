@@ -311,6 +311,7 @@ int main() {
 	loader::loadBindings();
 	loader::loadStage(
 		userConfig["META_STAGE_NAME"], &player,
+		physicsData,
 		&logicGates, &flags,
 		&textureNames
 	);

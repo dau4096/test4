@@ -51,15 +51,15 @@ int* managePTR(std::string ptrStr, std::array<int, constants::MAX_FLAGS>* flags)
 
 
 static const std::unordered_map<std::string, int> enumMap = {
-	//Logic gates 			Walls 					Visplanes 				Sprites 				Displacements
-	{"G_INVALID", 0}, 		{"W_INVALID", 0}, 		{"V_INVALID", 0}, 		{"SPR_INVALID", 0},		{"D_INVALID", 0},
-	{"G_PASSTHROUGH", 1}, 	{"W_NORMAL", 1},	 	{"V_NORMAL", 1}, 		{"SPR_DECO", 1}, 		{"D_NORMAL", 1},
-	{"G_AND", 2}, 			{"W_TRIGGER", 2},	 	{"V_TRIGGER", 2}, 		{"SPR_LIGHT", 2}, 
-	{"G_OR", 3}, 			{"W_MOVEV_FAST", 3},	{"V_MOVEV_FAST", 3}, 
-	{"G_NOT", 4}, 			{"W_MOVEV_SLOW", 4},	{"V_MOVEV_SLOW", 4}, 
-	{"G_XOR", 5}, 			{"W_MOVEH_FAST", 5},	{"V_HURT", 5}, 
-	{"G_LATCH", 6}, 		{"W_MOVEH_SLOW", 6},
-	{"G_PULSE", 7}, 		{"W_SWITCH", 7}, 
+	//Logic gates 			Items 					Enemies 				Projectiles
+	{"G_INVALID", 0}, 		{"I_INVALID", 0}, 		{"E_INVALID", 0}, 		{"P_INVALID", 0},
+	{"G_PASSTHROUGH", 1}, 	{"I_HEALTH_SMALL", 1},	{"E_MELEE", 1}, 		{"P_BALL", 1},
+	{"G_AND", 2}, 			{"I_HEALTH_LARGE", 2},	{"E_RANGED", 2}, 		{"P_ROCKET", 2}, 
+	{"G_OR", 3}, 			{"I_ENERGY_SMALL", 3},
+	{"G_NOT", 4}, 			{"I_ENERGY_LARGE", 4},
+	{"G_XOR", 5},
+	{"G_LATCH", 6},
+	{"G_PULSE", 7},
 	{"G_TOGGLE", 8},
 };
 
@@ -203,7 +203,6 @@ std::vector<T> fetchObjectFromXML(
 			std::array<int, constants::MAX_FLAGS>* flags,
 			std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
 		)> extractor,
-		size_t* numObjects,
 		std::array<int, constants::MAX_FLAGS>* flags=nullptr,
 		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames=nullptr
 	)
@@ -211,7 +210,6 @@ std::vector<T> fetchObjectFromXML(
 	std::vector<T> result{};
 	pugi::xpath_node_set nodeList = doc.select_nodes(xpath.c_str());
 	size_t count = static_cast<size_t>(nodeList.size());
-	*numObjects = count;
 	
 	for (size_t i=0; i<count; i++) {
 		pugi::xml_node node = nodeList[i].node();
@@ -220,6 +218,216 @@ std::vector<T> fetchObjectFromXML(
 	return result;
 }
 
+
+
+
+static inline CubeStatic extractCubeStatic(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	CubeStatic cs = CubeStatic(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "dimensions", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getBool(node, "collision", false),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return cs;
+}
+
+static inline Quadrilateral extractQuadrilateral(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	Quadrilateral q = Quadrilateral(
+		getVec3(node, "vert0", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert1", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert2", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert3", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getBool(node, "collision", false),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return q;
+}
+
+static inline Triangle extractTriangle(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	Triangle t = Triangle(
+		getVec3(node, "vert0", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert1", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert2", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getBool(node, "collision", false),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return t;
+}
+
+static inline SpriteDeco extractSpriteDeco(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	SpriteDeco sd = SpriteDeco(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		glm::vec2(
+			getFloat(node, "width", 0.0f),
+			getFloat(node, "height", 0.0f)
+		),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return sd;
+}
+
+static inline SpriteItem extractSpriteItem(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	SpriteItem si = SpriteItem(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		glm::vec2(
+			getFloat(node, "width", 0.0f),
+			getFloat(node, "height", 0.0f)
+		),
+		static_cast<ItemType>(getEnum(node, "type", I_INVALID)),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return si;
+}
+
+static inline TriggerVolume extractTriggerVolume(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	TriggerVolume tv = TriggerVolume(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "dimensions", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getPTR(node, flags, "flag", nullptr)
+	);
+	
+	return tv;
+}
+
+static inline Interactable extractInteractable(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	Interactable i = Interactable(
+		getVec3(node, "vert0", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert1", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert2", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "vert3", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getPTR(node, flags, "flag", nullptr),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return i;
+}
+
+static inline CubePath extractCubePath(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	CubePath cp = CubePath(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "dimensions", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "movement", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getFloat(node, "speed", 0.0f),
+		getPTR(node, flags, "flag", nullptr),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return cp;
+}
+
+static inline SpriteHostile extractSpriteHostile(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	SpriteHostile sh = SpriteHostile(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "dimensions", glm::vec3(0.0f, 0.0f, 0.0f)),
+		static_cast<EnemyType>(getEnum(node, "type", E_INVALID)),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return sh;
+}
+
+static inline CubePhysics extractCubePhysics(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	CubePhysics cp = CubePhysics(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "dimensions", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getFloat(node, "mass", 0.0f),
+		getTexture(node, textureNames, "texture", initial::FALLBACK_TEXTURE_NAME)
+	);
+	
+	return cp;
+}
+
+static inline Light extractLight(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	Light l = Light(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "direction", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getVec3(node, "colour", glm::vec3(0.0f, 0.0f, 0.0f)),
+		getFloat(node, "fov", 0.0f),
+		getFloat(node, "minZ", 0.0f),
+		getFloat(node, "maxZ", 0.0f),
+		getPTR(node, flags, "flag", nullptr)
+	);
+	
+	return l;
+}
+
+size_t pathNodeIdx = 0;
+static inline PathNode extractPathNode(
+		const pugi::xml_node& node,
+		std::array<int, constants::MAX_FLAGS>* flags,
+		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
+	) {
+
+	std::vector<int> blankList;
+	PathNode pn = PathNode(
+		getVec3(node, "position", glm::vec3(0.0f, 0.0f, 0.0f)),
+		pathNodeIdx,
+		blankList
+	);
+	pathNodeIdx++;
+	
+	return pn;
+}
 
 
 
@@ -253,6 +461,16 @@ static inline float handlePlayerHEString(std::string inputSTR, float maxValue) {
 
 void retrieveStageMetaData(const pugi::xml_document& doc, utils::Player* player) {
 	*player = utils::Player();
+
+	//Player
+	pugi::xml_node playerNode = getMetaNode(doc, "player");
+	stageData.playerStartPoint = getVec3(playerNode, "startPoint", initial::PLAYER_START_POSITION);
+	stageData.playerStartAngle = getVec2(playerNode, "startAngle", initial::PLAYER_START_VANGLE);
+
+	//Physics
+	pugi::xml_node physNode = getMetaNode(doc, "physics");
+	stageData.gravity = getFloat(playerNode, "gravity", initial::PHYS_GRAVITY);
+	stageData.killPlaneZ = getFloat(playerNode, "killPlaneZ", initial::PHYS_KPZ);
 }
 
 
@@ -380,7 +598,7 @@ namespace loader {
 
 void loadStage(
 		const std::string& stageName, utils::Player* player,
-		//std::vector<utils::Type>* typeData,
+		utils::DataSet* dataSet,
 		std::vector<utils::LogicGate>* logicGates,
 		std::array<int, constants::MAX_FLAGS>* flags,
 		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames
@@ -395,7 +613,17 @@ void loadStage(
 		throw std::runtime_error("Failed to parse XML: " + std::string(parseResult.description()));
 	}
 	
-	//*typeData = xml::fetchObjectFromXML<utils::Type>(doc, "//types/type", xml::extractType, &validTypes, flags, textureNames);
+	dataSet->staticCubes = xml::fetchObjectFromXML<utils::CubeStatic>(doc, "//environment/staticCube", xml::extractCubeStatic, flags, textureNames);
+	dataSet->quadrilaterals = xml::fetchObjectFromXML<utils::Quadrilateral>(doc, "//environment/quad", xml::extractQuadrilateral, flags, textureNames);
+	dataSet->triangles = xml::fetchObjectFromXML<utils::Triangle>(doc, "//environment/tri", xml::extractTriangle, flags, textureNames);
+	dataSet->spriteDecos = xml::fetchObjectFromXML<utils::SpriteDeco>(doc, "//object/sprite", xml::extractSpriteDeco, flags, textureNames);
+	dataSet->spriteItems = xml::fetchObjectFromXML<utils::SpriteItem>(doc, "//object/item", xml::extractSpriteItem, flags, textureNames);
+	dataSet->triggerVolumes = xml::fetchObjectFromXML<utils::TriggerVolume>(doc, "//environment/trigger", xml::extractTriggerVolume, flags, textureNames);
+	dataSet->interactables = xml::fetchObjectFromXML<utils::Interactable>(doc, "//environment/switch", xml::extractInteractable, flags, textureNames);
+	dataSet->cubePaths = xml::fetchObjectFromXML<utils::CubePath>(doc, "//environment/cubeMove", xml::extractCubePath, flags, textureNames);
+	dataSet->spriteHostiles = xml::fetchObjectFromXML<utils::SpriteHostile>(doc, "//object/enemy", xml::extractSpriteHostile, flags, textureNames);
+	dataSet->cubePhysics = xml::fetchObjectFromXML<utils::CubePhysics>(doc, "//object/cubePhys", xml::extractCubePhysics, flags, textureNames);
+	dataSet->pathNodes = xml::fetchObjectFromXML<utils::PathNode>(doc, "//environment/node", xml::extractPathNode, flags, textureNames);
 
 
 	stageData.name = stageName;

@@ -10,6 +10,7 @@ namespace loader {
 
 	void loadStage(
 		const std::string& stageName, utils::Player* player,
+		utils::DataSet* dataSet,
 		std::vector<utils::LogicGate>* logicGates,
 		std::array<int, constants::MAX_FLAGS>* flags,
 		std::array<std::string, display::TEXTURE_ARRAY_MAX_LAYERS>* textureNames

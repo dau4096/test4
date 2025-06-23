@@ -1,5 +1,58 @@
 <?xml version="1.1" encoding="UTF-8"?>
 
-<tmp>
 
-</tmp>
+
+<meta>
+	<player startPosition="0.0 0.0 0.0" startAngle="0.0 0.0" />
+	<physics gravity="0.486" killPlaneZ="-16.0" />
+</meta>
+
+
+
+<environment>
+	
+	<quad vert0="20.0 -1.0 -10.0" vert1="-10.0 -1.0 -10.0" vert2="-10.0 -1.0 10.0" vert3="20.0 -1.0 10.0" texture="02" />
+	<cubeStatic position="1.0 1.0 1.0" dimensions="0.0 0.25 -2.0" texture="('01' 'base')" />
+	<cubeStatic position="1.0 3.0 1.0" dimensions="5.0 2.0 -2.0" texture="('01' 'base')" />
+	<quad vert0="1.0 -1.0 0.0" vert1="-3.2 1.0 0.0" vert2="-3.2 1.0 3.2" vert3="1.0 -1.0 3.2" texture="10" />
+	<quad vert0="0.0 1.0 7.0" vert1="2.5 1.0 7.0" vert2="2.5 -1.0 7.5" vert3="0.0 -1.0 7.5" texture="01" />
+	<quad vert0="0.0 -1.0 7.5" vert1="-2.5 -1.0 7.5" vert2="-2.5 1.0 7.5" vert3="0.0 1.0 7.0" texture="01" />
+	<quad vert0="-5.0 -1.0 7.5" vert1="-2.5 -1.0 7.5" vert2="-2.5 1.0 7.5" vert3="-5.0 1.0 7.5" texture="01" />
+	<quad vert0="-5.0 3.0 -5.0" vert1="-5.0 2.0 -2.5" vert2="-2.5 2.0 -2.5" vert3="-2.5 3.0 -5.0" texture="01" />
+	<quad vert0="-5.0 0.0 -5.0" vert1="-5.0 0.0 -2.5" vert2="-2.5 0.0 -2.5" vert3="-2.5 0.0 -5.0" texture="02" />
+	<tri vert0="6.0 0.0 -4.0" vert1="5.0 0.0 -5.0" vert2="5.5 1.0 -4.5" texture="07" />
+	<quad vert0="10.0 -1.0 10.0" vert1="9.0 -1.0 10.0" vert2="9.0 100.0 10000.0" vert3="10.0 100.0 10000.0" texture="07" />
+	<light position="-5.0 10.0 0.0" direction="0.0 0.0 0.0" colour="1.0 1.0 1.0 1.0" fov="90.0" minZ="0.01" maxZ="25.0" flag="ALWAYS" />
+	<trigger position="1.0 1.0 1.0" dimensions="15.0 -0.25 5.0" flag="1" />
+	<cubeStatic position="1.0 1.0 1.0" dimensions="15.0 -0.25 5.0" texture="18" />
+	<light position="13.0 2.0 5.0" direction="15.0 0.25 5.0" colour="1.0 1.0 1.0 1.0" fov="45.0" minZ="0.01" maxZ="7.5" flag="1" />
+	<cubePhys position="-5.0 1.0 5.0" dimensions="0.35 1.5 0.35" mass="10.0" texture="17" />
+	<cubePhys position="-5.0 1.0 5.5" dimensions="0.35 0.75 0.35" mass="10.0" texture="17" />
+	<switch vert0="15.0 -1.0 -7.5" vert1="15.0 -1.0 -6.5" vert2="15.0 0.0 -6.5" vert3="15.0 0.0 -7.5" flag="2" texture="09" />
+	<switch vert0="15.0 -1.0 -6.0" vert1="15.0 -1.0 -5.0" vert2="15.0 0.0 -5.0" vert3="15.0 0.0 -6.0" flag="3" texture="0A" />
+	<light position="14.0 5.0 -7.0" direction="15.0 0.0 -7.0" colour="1.0 1.0 1.0 1.0" fov="45.0" minZ="0.01" maxZ="10.0" flag="2" />
+	<light position="14.0 5.0 -5.5" direction="15.0 0.0 -5.5" colour="1.0 1.0 1.0 1.0" fov="45.0" minZ="0.01" maxZ="10.0" flag="3" />
+	<light position="14.0 5.0 -1.0" direction="15.0 0.0 -1.0" colour="1.0 1.0 1.0 1.0" fov="45.0" minZ="0.01" maxZ="10.0" flag="4" />
+	<light position="14.0 5.0 1.0" direction="15.0 0.0 1.0" colour="1.0 1.0 1.0 1.0" fov="45.0" minZ="0.01" maxZ="10.0" flag="5" />
+	<switch vert0="15.0 -1.0 -10.0" vert1="15.0 -1.0 -8.5" vert2="15.0 0.5 -8.5" vert3="15.0 0.5 -10.0" flag="6" texture="0B" />
+	<light position="10.0 15.0 -9.25" direction="15.0 0.0 -9.25" colour="1.0 1.0 1.0 1.0" fov="90.0" minZ="0.01" maxZ="25.0" flag="ALWAYS" />
+	<light position="14.0 5.0 -9.25" direction="15.0 0.0 -9.25" colour="1.0 1.0 1.0 1.0" fov="45.0" minZ="0.01" maxZ="10.0" flag="6" />
+	<quad vert0="15.0 0.5 -7.5" vert1="15.0 0.0 -7.5" vert2="15.0 0.0 -6.5" vert3="15.0 0.5 -6.5" texture="FF" />
+	<quad vert0="15.0 0.5 -10.0" vert1="15.0 1.0 -10.0" vert2="15.0 1.0 -6.5" vert3="15.0 0.5 -6.5" texture="FF" />
+	<cubeMove position="15.06 -0.25 -8.0" dimensions="0.1 1.5 1.0" movement="0.0 0.0 -1.0" speed="0.05" flag="6" texture="17" />
+	<tri vert0="-5.0 0.0 -5.0" vert1="-5.0 0.0 -4.75" vert2="-5.0 -0.25 -4.875" texture="00" />
+
+</environment>
+
+
+
+<object>
+
+	<enemy position="-5.0 1.0 4.0" type="E_RANGED" />
+	<sprite position="-5.0 -1.0 3.0" dimensions="1.0 1.0 1.0" texture="05" />
+	<item position="9.25 0.0 -9.5" type="I_HEALTH_SMALL" texture="01" />
+	<item position="9.75 0.0 -9.5" type="I_HEALTH_LARGE" texture="02" />
+	<item position="10.25 0.0 -9.5" type="I_ENERGY_SMALL" texture="03" />
+	<item position="10.75 0.0 -9.5" type="I_ENERGY_LARGE" texture="04" />
+
+</object>

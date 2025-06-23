@@ -275,15 +275,15 @@ namespace utils {
 
 
 	struct Texture {
-		glm::vec2 dimentions;
+		glm::vec2 dimensions;
 		int channels;
 		unsigned char* data;
 		bool valid;
 
-		Texture() : dimentions(0.0f, 0.0f), channels(0), data(nullptr), valid(false) {}
+		Texture() : dimensions(0.0f, 0.0f), channels(0), data(nullptr), valid(false) {}
 
-		Texture(glm::vec2 dimentions, int channels, unsigned char* data)
-			: dimentions(dimentions), channels(channels), data(data), valid(true) {}
+		Texture(glm::vec2 dimensions, int channels, unsigned char* data)
+			: dimensions(dimensions), channels(channels), data(data), valid(true) {}
 	};
 
 
@@ -307,17 +307,233 @@ namespace utils {
 
 
 
+	//From original.
+	struct CubeStatic {
+		glm::vec3 position, dimensions;
+		bool collision;
+		GLuint textureID;
+
+		CubeStatic() : position(), dimensions(), collision(), textureID() {}
+
+		CubeStatic(glm::vec3 position, glm::vec3 dimensions, bool collision, GLuint textureID)
+			: position(position), dimensions(dimensions),
+			  collision(collision), textureID(textureID) {}
+	};
+
+	struct Quadrilateral {
+		std::array<glm::vec3, 4> vertices;
+		bool collision;
+		GLuint textureID;
+
+		Quadrilateral() : vertices(), collision(), textureID() {}
+
+		Quadrilateral(
+			glm::vec3 A, glm::vec3 B, glm::vec3 C, glm::vec3 D,
+			bool collision, GLuint textureID
+		) : vertices{A, B, C, D}, collision(collision), textureID(textureID) {}
+
+		Quadrilateral(
+			std::array<glm::vec3, 4> verts, bool collision, GLuint textureID
+		) : collision(collision), textureID(textureID) {
+			for (size_t idx=0; idx<4; idx++) {
+				vertices.at(idx) = verts.at(idx);
+			}
+		}
+	};
+
+	struct Triangle {
+		std::array<glm::vec3, 3> vertices;
+		bool collision;
+		GLuint textureID;
+
+		Triangle() : vertices(), collision(), textureID() {}
+
+		Triangle(
+			glm::vec3 A, glm::vec3 B, glm::vec3 C,
+			bool collision, GLuint textureID
+		) : vertices{A, B, C}, collision(collision), textureID(textureID) {}
+
+		Triangle(
+			std::array<glm::vec3, 3> verts, bool collision, GLuint textureID
+		) : collision(collision), textureID(textureID) {
+			for (size_t idx=0; idx<3; idx++) {
+				vertices.at(idx) = verts.at(idx);
+			}
+		}
+	};
+
+	struct SpriteDeco {
+		glm::vec3 position;
+		glm::vec2 dimensions;
+		GLuint textureID;
+
+		SpriteDeco() : position(), dimensions(), textureID() {}
+
+		SpriteDeco(glm::vec3 position, glm::vec2 dimensions, GLuint textureID)
+			: position(position), dimensions(dimensions),
+			  textureID(textureID) {}
+	};
+
+	struct SpriteItem {
+		glm::vec3 position;
+		glm::vec2 dimensions;
+		ItemType type;
+		GLuint textureID;
+
+		SpriteItem() : position(), dimensions(), type(I_INVALID), textureID() {}
+
+		SpriteItem(glm::vec3 position, glm::vec2 dimensions, ItemType type, GLuint textureID)
+			: position(position), dimensions(dimensions),
+			  type(type), textureID(textureID) {}
+	};
+
+	struct TriggerVolume {
+		glm::vec3 position, dimensions;
+		int* IOPtr;
+
+		TriggerVolume() : position(), dimensions(), IOPtr() {}
+
+		TriggerVolume(glm::vec3 position, glm::vec3 dimensions, int* ptr)
+			: position(position), dimensions(dimensions),
+			  IOPtr(ptr) {}
+	};
+
+	struct Interactable {
+		std::array<glm::vec3, 4> vertices;
+		int* IOPtr;
+		GLuint textureID;
+
+		Interactable() : vertices(), IOPtr(), textureID() {}
+
+		Interactable(
+			glm::vec3 A, glm::vec3 B, glm::vec3 C, glm::vec3 D,
+			int* ptr, GLuint textureID
+		) : vertices{A, B, C, D}, IOPtr(ptr), textureID(textureID) {}
+
+		Interactable(
+			std::array<glm::vec3, 4> verts, int* ptr, GLuint textureID
+		) : IOPtr(ptr), textureID(textureID) {
+			for (size_t idx=0; idx<4; idx++) {
+				vertices.at(idx) = verts.at(idx);
+			}
+		}
+	};
+
+	struct CubePath {
+		glm::vec3 position, dimensions, movement;
+		float speed;
+		int* IOPtr;
+		GLuint textureID;
+
+		CubePath() : position(), dimensions(), movement(), speed(), IOPtr(), textureID() {}
+
+		CubePath(glm::vec3 position, glm::vec3 dimensions, glm::vec3 movement, float speed, int* ptr, GLuint textureID)
+			: position(position), dimensions(dimensions), movement(),
+			  speed(speed), IOPtr(ptr), textureID(textureID) {}
+	};
+
+	struct SpriteHostile {
+		glm::vec3 position;
+		glm::vec2 dimensions;
+		EnemyType type;
+		GLuint textureID;
+
+		SpriteHostile() : position(), dimensions(), type(E_INVALID), textureID() {}
+
+		SpriteHostile(glm::vec3 position, glm::vec2 dimensions, EnemyType type, GLuint textureID)
+			: position(position), dimensions(dimensions),
+			  type(type), textureID(textureID) {}
+	};
+
+	struct CubePhysics {
+		glm::vec3 position, dimensions;
+		float mass;
+		GLuint textureID;
+
+		CubePhysics() : position(), dimensions(), mass(), textureID() {}
+
+		CubePhysics(glm::vec3 position, glm::vec3 dimensions, float mass, GLuint textureID)
+			: position(position), dimensions(dimensions),
+			  mass(mass), textureID(textureID) {}
+	};
+
+	struct Light {
+		glm::vec3 position, direction, colour;
+		float FOV, minZ, maxZ;
+		int* IOPtr;
+
+		Light() : position(), direction(), colour(), FOV(), minZ(), maxZ(), IOPtr(nullptr) {}
+
+		Light(
+			glm::vec3 position, glm::vec3 direction, glm::vec3 colour,
+			float FOV, float minZ, float maxZ, int* ptr
+		) : position(position), direction(direction), colour(colour),
+			FOV(FOV), minZ(minZ), maxZ(maxZ), IOPtr(ptr) {}
+	};
+
+	struct PathNode {
+		glm::vec3 position;
+		int index;
+		std::vector<int> neighbours;
+
+		PathNode() : position(), index(-1), neighbours() {}
+
+		PathNode(glm::vec3 position, int index, std::vector<int>& connections)
+			: position(position), index(index) {
+				for (int idx : connections) {
+					neighbours.push_back(idx);
+				}
+			}
+	};
+
+	struct Projectile {
+		glm::vec3 position, velocity;
+		ProjectileType type;
+		int strength;
+		GLuint textureID;
+
+		Projectile() : position(), velocity(), type(P_INVALID), strength(), textureID() {}
+
+		Projectile(glm::vec3 position, glm::vec3 velocity, ProjectileType type, int strength, GLuint textureID)
+			: position(position), velocity(velocity), type(type), strength(strength), textureID(textureID) {}
+	};
+
+	struct Explosion {
+		glm::vec3 position, dimensions;
+		float strength;
+		bool expended;
+		GLuint textureID;
+
+		Explosion() : position(), dimensions(), strength(), expended(true), textureID() {}
+
+		Explosion(glm::vec3 position, glm::vec3 dimensions, int strength, GLuint textureID)
+			: position(position), dimensions(dimensions), strength(strength), expended(false), textureID(textureID) {}
+	};
+
 
 	struct DataSet {
-		//Empty for now :)
+		std::vector<CubeStatic> staticCubes;
+		std::vector<Quadrilateral> quadrilaterals;
+		std::vector<Triangle> triangles;
+		std::vector<SpriteDeco> spriteDecos;
+		std::vector<SpriteItem> spriteItems;
+		std::vector<TriggerVolume> triggerVolumes;
+		std::vector<Interactable> interactables;
+		std::vector<CubePath> cubePaths;
+		std::vector<SpriteHostile> spriteHostiles;
+		std::vector<CubePhysics> cubePhysics;
+		std::vector<Light> lights;
+		std::vector<PathNode> pathNodes;
+		std::vector<Projectile> projectiles;
+		std::vector<Explosion> explosions;
 	};
 
 
 	struct Ray {
-		glm::vec2 position, direction, end;
+		glm::vec3 position, direction;
 
-		Ray(glm::vec2 position, glm::vec2 direction, float len=configToFloat("VIEW_MAX_RAY_DIST"))
-			: position(position), direction(direction), end(position + (direction * len)) {}
+		Ray(glm::vec3 position, glm::vec3 direction)
+			: position(position), direction(direction) {}
 	};
 }
 
