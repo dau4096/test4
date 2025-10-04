@@ -30,7 +30,7 @@ try:
 	os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 
-	sys.path.extend(("src", r"src\exct\data", r"src\exct\glsl"))
+	sys.path.extend(("src", r"src/exct/data", r"src/exct/glsl"))
 	import glm, glfw
 	import pygame as PG
 	from pygame import time, joystick, display, image
@@ -48,7 +48,7 @@ except Exception as E:
 	log.ERROR("main.py", E)
 
 #Formatting for the terminal output.
-print("--\n")
+print("--/n")
 
 
 from OpenGL.GL import *
@@ -89,7 +89,7 @@ def MAIN():
 		print("Current user configs;")
 		for OPTION in PREFERENCES:
 			print(f"{OPTION}: {PREFERENCES[OPTION]}")
-		print("\n")
+		print("/n")
 
 
 
@@ -169,7 +169,7 @@ def MAIN():
 
 		#Set the context back as the main PG window, and convert any shadow map data.
 		PG.display.set_caption("test4.2.7//main.py")
-		PG.display.set_icon(PG.image.load("src\\imgs\\main.ico"))
+		PG.display.set_icon(PG.image.load("src//imgs//main.ico"))
 		SCREEN = PG.display.set_mode(list(DISPLAY_RESOLUTION), PG.DOUBLEBUF | PG.OPENGL | PG.RESIZABLE)
 
 		(
@@ -331,7 +331,7 @@ def MAIN():
 												PLAYER.ID,									#"Owner" is player.
 											)
 
-											#Add to PHYS_DATA\KINETICs
+											#Add to PHYS_DATA/KINETICs
 											PHYS_DATA[0][scene.CURRENT_ID] = PROJ
 
 										#Remove ENERGY from PLAYER, if INF_ENERGY is not True.
@@ -538,7 +538,7 @@ def MAIN():
 			UI_TEXTURE_ID = ui.HUD(PLAYER, FPS)
 			if PREFERENCES["DEBUG_UI"]:
 				#Save map if DEBUG_UI is enabled.
-				render.SAVE_MAP(CONSTANTS["UI_RESOLUTION"], UI_TEXTURE_ID, f"src\\debug_maps\\colour_map_ui.png", "COLOUR")
+				render.SAVE_MAP(CONSTANTS["UI_RESOLUTION"], UI_TEXTURE_ID, f"src//debug_maps//colour_map_ui.png", "COLOUR")
 
 
 			#Rendering the main scene.

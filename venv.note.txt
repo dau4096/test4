@@ -1,0 +1,9 @@
+//Running in a VENV;
+source /home/dau/PythonVENV/test4/bin/activate
+python3 /home/dau/Documents/GitHub/test4/main.py
+
+//Installing new modules;
+vim /home/dau/Documents/GitHub/test4/requirements.txt
+//(esc->:wq to leave and save.)
+pip install -r "/home/dau/Documents/GitHub/test4/requirements.txt"
+

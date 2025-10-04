@@ -19,8 +19,8 @@ try:
 	#Stop PyGame from giving that annoying welcome message
 	os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-	#Load modules stored in \src\modules\
-	sys.path.extend(("src", r"src\exct\data", r"src\exct\glsl"))
+	#Load modules stored in /src/modules/
+	sys.path.extend(("src", r"src/exct/data", r"src/exct/glsl"))
 	import glm, glfw
 	import pygame as PG
 	from pygame import time, joystick, display, image
@@ -96,7 +96,7 @@ def GET_TEXTURE_DATA(TEXTURE, RESOLUTION, TYPE, MIN_DISTANCE=0.0, MAX_DISTANCE=1
 
 		case _:
 			#If the type is not supported, raise an error.
-			raise TypeError(f"Map type {TYPE} is not recognised. Please choose from;\nDEPTH\nCOLOUR")
+			raise TypeError(f"Map type {TYPE} is not recognised. Please choose from;/nDEPTH/nCOLOUR")
 
 
 	glBindTexture(GL_TEXTURE_2D, 0)
@@ -312,7 +312,7 @@ def SAVE_MAP(RESOLUTION, MAP, FILE_NAME, MAP_TYPE, MIN_DISTANCE=0.0, MAX_DISTANC
 			DATA = glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT)
 			DATA = NP.frombuffer(DATA, dtype=NP.float32).reshape(int(RESOLUTION.Y), int(RESOLUTION.X))
 			DATA = NP.flipud(DATA)
-			if DEBUG: print("Depth data before normalization:\n", DATA)
+			if DEBUG: print("Depth data before normalization:/n", DATA)
 
 			# Normalize depth data and ensure no NaN values
 			DEPTH_MIN = utils.CLAMP(NP.min(DATA), MIN_DISTANCE, MAX_DISTANCE)
@@ -336,7 +336,7 @@ def SAVE_MAP(RESOLUTION, MAP, FILE_NAME, MAP_TYPE, MIN_DISTANCE=0.0, MAX_DISTANC
 			#Normal maps. X=R, Y=G, Z=B.
 			DATA = glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT)
 			DATA = NP.frombuffer(DATA, dtype=NP.float32).reshape(int(RESOLUTION.Y), int(RESOLUTION.X), 3)
-			if DEBUG: print("Normal data before processing:\n", DATA)
+			if DEBUG: print("Normal data before processing:/n", DATA)
 
 			DATA = NP.flipud(DATA)
 
@@ -353,7 +353,7 @@ def SAVE_MAP(RESOLUTION, MAP, FILE_NAME, MAP_TYPE, MIN_DISTANCE=0.0, MAX_DISTANC
 			#Colour with no Alpha value.
 			DATA = glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE)
 			DATA = NP.frombuffer(DATA, dtype=NP.uint8).reshape(int(RESOLUTION.Y), int(RESOLUTION.X), 3)
-			if DEBUG: print("Colour data before processing:\n", DATA)
+			if DEBUG: print("Colour data before processing:/n", DATA)
 
 			# Flip the image data vertically
 			DATA = NP.flipud(DATA)
@@ -368,7 +368,7 @@ def SAVE_MAP(RESOLUTION, MAP, FILE_NAME, MAP_TYPE, MIN_DISTANCE=0.0, MAX_DISTANC
 			#Colour with an Alpha value.
 			DATA = glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE)
 			DATA = NP.frombuffer(DATA, dtype=NP.uint8).reshape(int(RESOLUTION.Y), int(RESOLUTION.X), 4)
-			if DEBUG: print("Colour data before processing:\n", DATA)
+			if DEBUG: print("Colour data before processing:/n", DATA)
 
 			# Flip the image data vertically
 			DATA = NP.flipud(DATA)
@@ -740,7 +740,7 @@ def SHADER_INIT(SCENE=False, QUAD=False, SHADOW=False):
 		return SOURCE
 	
 
-	#Get filepath to ..\src\exct\glsl\
+	#Get filepath to ../src/exct/glsl/
 	GLSL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'glsl')
 	
 
@@ -749,8 +749,8 @@ def SHADER_INIT(SCENE=False, QUAD=False, SHADOW=False):
 
 	if SCENE:
 		#Scene Shaders (for the stuff rendered on the 1st quad.)
-		SCENE_VERTEX_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}\\scene_vertex_shader.glsl")
-		SCENE_FRAGMENT_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}\\scene_fragment_shader.glsl")
+		SCENE_VERTEX_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}//scene_vertex_shader.glsl")
+		SCENE_FRAGMENT_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}//scene_fragment_shader.glsl")
 		SCENE_VERTEX_SHADER_COMPILED = compileShader(SCENE_VERTEX_SHADER_SOURCE, GL_VERTEX_SHADER)
 		SCENE_FRAGMENT_SHADER_COMPILED = compileShader(SCENE_FRAGMENT_SHADER_SOURCE, GL_FRAGMENT_SHADER)
 		SCENE_SHADER = compileProgram(SCENE_VERTEX_SHADER_COMPILED, SCENE_FRAGMENT_SHADER_COMPILED)
@@ -758,8 +758,8 @@ def SHADER_INIT(SCENE=False, QUAD=False, SHADOW=False):
 
 	if QUAD:
 		#Quad Shaders (for the 2 quads (UI and scene TCB) to display the colour data.)
-		QUAD_VERTEX_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}\\quad_vertex_shader.glsl")
-		QUAD_FRAGMENT_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}\\quad_fragment_shader.glsl")
+		QUAD_VERTEX_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}//quad_vertex_shader.glsl")
+		QUAD_FRAGMENT_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}//quad_fragment_shader.glsl")
 		QUAD_VERTEX_SHADER_COMPILED = compileShader(QUAD_VERTEX_SHADER_SOURCE, GL_VERTEX_SHADER)
 		QUAD_FRAGMENT_SHADER_COMPILED = compileShader(QUAD_FRAGMENT_SHADER_SOURCE, GL_FRAGMENT_SHADER)
 		QUAD_SHADER = compileProgram(QUAD_VERTEX_SHADER_COMPILED, QUAD_FRAGMENT_SHADER_COMPILED)
@@ -767,8 +767,8 @@ def SHADER_INIT(SCENE=False, QUAD=False, SHADOW=False):
 
 	if SHADOW:
 		#Shadow Shaders (for the shadow-mapping stage.)
-		SHADOW_VERTEX_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}\\shadow_vertex_shader.glsl")
-		SHADOW_FRAGMENT_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}\\shadow_fragment_shader.glsl")
+		SHADOW_VERTEX_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}//shadow_vertex_shader.glsl")
+		SHADOW_FRAGMENT_SHADER_SOURCE = LOAD_SHADER_SOURCE(f"{GLSL_PATH}//shadow_fragment_shader.glsl")
 		SHADOW_VERTEX_SHADER_COMPILED = compileShader(SHADOW_VERTEX_SHADER_SOURCE, GL_VERTEX_SHADER)
 		SHADOW_FRAGMENT_SHADER_COMPILED = compileShader(SHADOW_FRAGMENT_SHADER_SOURCE, GL_FRAGMENT_SHADER)
 		SHADOW_SHADER = compileProgram(SHADOW_VERTEX_SHADER_COMPILED, SHADOW_FRAGMENT_SHADER_COMPILED)
@@ -907,7 +907,7 @@ def CREATE_FBO(SIZE, DEPTH=False, NORMALS=False):
 	STATUS = glCheckFramebufferStatus(GL_FRAMEBUFFER)
 	if STATUS != GL_FRAMEBUFFER_COMPLETE:
 		#If an error has occurred, raise an exception.
-		raise Exception(f"Framebuffer of size {SIZE} is not complete.\nError: {STATUS}")
+		raise Exception(f"Framebuffer of size {SIZE} is not complete./nError: {STATUS}")
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0)
@@ -1087,7 +1087,7 @@ def CREATE_SHADOW_MAPS(SURFACE, I, LIGHT, VAO_DATA, SHEETS_USED):
 
 
 	if PREFERENCES["DEBUG_MAPS"]:
-		SAVE_MAP(CONSTANTS["SHADOW_MAP_RESOLUTION"], DTB_SHADOW, f"src\\debug_maps\\depth_map_{I}.png", "COLOUR_RGBA", MIN_DISTANCE=LIGHT.MIN_DISTANCE, MAX_DISTANCE=LIGHT.MAX_DISTANCE)
+		SAVE_MAP(CONSTANTS["SHADOW_MAP_RESOLUTION"], DTB_SHADOW, f"src//debug_maps//depth_map_{I}.png", "COLOUR_RGBA", MIN_DISTANCE=LIGHT.MIN_DISTANCE, MAX_DISTANCE=LIGHT.MAX_DISTANCE)
 
 
 	#Assign data to the Light instance, including the data from the DTB to pass accross the contexts again.

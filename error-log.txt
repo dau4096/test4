@@ -318,3 +318,58 @@
 17:01:52, 20-10-2024 / ERROR in main.py / unindent does not match any outer indentation level (texture_load.py, line 62)
 17:02:05, 20-10-2024 / ERROR in render.py / unindent does not match any outer indentation level (ui.py, line 296)
 17:02:20, 20-10-2024 / ERROR in render.py / unindent does not match any outer indentation level (scene.py, line 77)
+00:05:30, 05-10-2025 / ERROR in utils.py / Initial imports failed.
+00:06:36, 05-10-2025 / ERROR in utils.py / Initial imports failed.
+00:07:13, 05-10-2025 / ERROR in utils.py / Initial imports failed: No module named 'multiprocess'
+00:07:46, 05-10-2025 / ERROR in utils.py / [Errno 2] No such file or directory: '/home/dau/Documents/GitHub/test4/src/exct/data\\config.dat'
+00:08:31, 05-10-2025 / ERROR in Main.py Value initialisation / [Errno 2] No such file or directory: '/home/dau/Documents/GitHub/test4/src/exct/glsl\\shadow_vertex_shader.glsl'
+00:08:52, 05-10-2025 / ERROR in Main.py Value initialisation / [Errno 2] No such file or directory: '/home/dau/Documents/GitHub/test4/src/exct/glsl\\shadow_vertex_shader.glsl'
+00:09:28, 05-10-2025 / ERROR in Main.py Value initialisation / GLError(
+	err = 1285,
+	description = b'out of memory',
+	baseOperation = glTexImage3D,
+	pyArgs = (
+		GL_TEXTURE_2D_ARRAY,
+		0,
+		GL_RGB32F,
+		4096,
+		4096,
+		8,
+		0,
+		GL_RGB,
+		GL_FLOAT,
+		array([[[[0.5686275 , 0.5686275 , 0.5686275 ],
+         [0.5686275 , 0.5686275 , 0.5686275 ],
+         [0.5686275 , 0...,
+	),
+	cArgs = (
+		GL_TEXTURE_2D_ARRAY,
+		0,
+		GL_RGB32F,
+		4096,
+		4096,
+		8,
+		0,
+		GL_RGB,
+		GL_FLOAT,
+		array([[[[0.5686275 , 0.5686275 , 0.5686275 ],
+         [0.5686275 , 0.5686275 , 0.5686275 ],
+         [0.5686275 , 0...,
+	),
+	cArguments = (
+		GL_TEXTURE_2D_ARRAY,
+		0,
+		GL_RGB32F,
+		4096,
+		4096,
+		8,
+		0,
+		GL_RGB,
+		GL_FLOAT,
+		array([[[[0.5686275 , 0.5686275 , 0.5686275 ],
+         [0.5686275 , 0.5686275 , 0.5686275 ],
+         [0.5686275 , 0...,
+	)
+)
+00:10:20, 05-10-2025 / ERROR in Main.py Value initialisation / No file 'src\imgs\ui-vignette.png' found in working directory '/home/dau/Documents/GitHub/test4'.
+00:12:25, 05-10-2025 / ERROR in physics.UPDATE_PHYSICS / float division by zero

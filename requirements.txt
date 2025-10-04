@@ -1,0 +1,8 @@
+pyglm
+pyopengl
+numpy
+pygame
+pillow
+glfw
+pyrr
+multiprocess

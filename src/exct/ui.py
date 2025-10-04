@@ -18,7 +18,7 @@ try:
 	#Stop PyGame from giving that annoying welcome message
 	os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-	sys.path.extend(("src", r"src\exct\data", r"src\exct\glsl"))
+	sys.path.extend(("src", r"src/exct/data", r"src/exct/glsl"))
 	import pygame as PG
 	from pygame import time, joystick, display, image
 	from OpenGL.GL import *
@@ -170,7 +170,7 @@ def DRAW_OPTIONS_TEXT(UI_SURFACE):
 
 def DRAW_TEXT(SCREEN, TEXT, POSITION, FONT_SIZE, COLOUR=RGBA(255, 255, 255, 255)):
 	#Draws text on a given surface, with colour, size and position.
-	FONT = PG.font.Font('src\\exct\\fonts\\PressStart2P-Regular.ttf', FONT_SIZE)
+	FONT = PG.font.Font('src//exct//fonts//PressStart2P-Regular.ttf', FONT_SIZE)
 	text_surface = FONT.render(str(TEXT), True, list(COLOUR))
 	SCREEN.blit(text_surface, POSITION)
 
@@ -183,11 +183,11 @@ def LOAD_IMG(IMAGE_NAME):
 		return IMAGE
 
 def DRAW_IMG(SCREEN, IMG_NAME, POSITION, SCALE):
-	#Draws an image loaded from the file structure (in \src\imgs\) to a position and with scale.
+	#Draws an image loaded from the file structure (in /src/imgs/) to a position and with scale.
 	try:
-		IMAGE = LOAD_IMG(f"src\\imgs\\{IMG_NAME}")
+		IMAGE = LOAD_IMG(f"src//imgs//{IMG_NAME}")
 	except FileNotFoundError:
-		IMAGE = LOAD_IMG(f"src\\imgs\\{texture_load.FALLBACK_TEXTURE}")
+		IMAGE = LOAD_IMG(f"src//imgs//{texture_load.FALLBACK_TEXTURE}")
 	SCALED_IMAGE = PG.transform.scale(IMAGE, SCALE)
 	SCREEN.blit(SCALED_IMAGE, POSITION)
 
@@ -210,7 +210,7 @@ def UPDATE_VIGNETTE(NEW_VIGNETTE_COLOUR, FPS, FADEOUT=None):
 			VIGNETTE_COLOUR.B,
 			FADE * 255,
 		)
-		VIGNETTE_IMAGE = LOAD_IMG("src\\imgs\\ui-vignette")
+		VIGNETTE_IMAGE = LOAD_IMG("src//imgs//ui-vignette")
 		COLOURED_VIGNETTE = PG.Surface(list(CONSTANTS["UI_RESOLUTION"]), PG.SRCALPHA)
 		COLOURED_VIGNETTE.fill(list(FADE_COLOUR))
 		COLOURED_VIGNETTE.blit(VIGNETTE_IMAGE, (0, 0), special_flags=PG.BLEND_RGBA_MULT)
@@ -361,7 +361,7 @@ def PROCESS_UI_STATE(SCREEN, UI_TYPE, KEY_STATES, VAOs, QUAD_SHADER, BACKGROUND=
 			else:
 				UI_SURFACE, EXTRA_DATA, UI_ACTIVE = UI_TYPE(DEFAULT_DATA) #Call one of the UI functions without data
 			UI_SURFACE_ID = render.SURFACE_TO_TEXTURE(UI_SURFACE, CONSTANTS["UI_RESOLUTION"].TO_INT())
-			if PREFERENCES["DEBUG_UI"]: render.SAVE_MAP(CONSTANTS["UI_RESOLUTION"], UI_SURFACE_ID, f"src\\debug_maps\\colour_map_UI.png", "COLOUR")
+			if PREFERENCES["DEBUG_UI"]: render.SAVE_MAP(CONSTANTS["UI_RESOLUTION"], UI_SURFACE_ID, f"src//debug_maps//colour_map_UI.png", "COLOUR")
 
 
 			if "QUIT" in EXTRA_DATA:

@@ -20,14 +20,14 @@ try: #Module Imports
 	#Stop PyGame from giving that annoying welcome message
 	os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-	sys.path.extend(("src", r"src\exct\data", r"src\exct\glsl"))
+	sys.path.extend(("src", r"src/exct/data", r"src/exct/glsl"))
 	import pygame as PG
 	from pygame import time, joystick, display, image
 	import glm
 	import multiprocess as MP
 
-except ImportError:
-	log.ERROR("utils.py", "Initial imports failed.")
+except ImportError as e:
+	log.ERROR("utils.py", f"Initial imports failed: {e}")
 
 
 log.REPORT_IMPORT("utils.py")
@@ -253,7 +253,7 @@ def GET_CUBOID_FACE_INDICES():
 
 
 def GET_DATA_PATH():
-	#Path for the ..\\test4.2.2\\exct\\data\\.. data files.
+	#Path for the ..//test4.2.2//exct//data//.. data files.
 	return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
@@ -275,7 +275,7 @@ def SAVE_CONFIGS(DATA):
 						NEW_VALUE = PREFERENCES[KEY]
 						if isinstance(NEW_VALUE, bool):
 							NEW_VALUE = "True" if NEW_VALUE else "False"
-						LINE = f"{KEY} = {NEW_VALUE}\n"
+						LINE = f"{KEY} = {NEW_VALUE}/n"
 				PREFERENCE_FILE.write(LINE)
 
 	except Exception as E:
@@ -285,7 +285,7 @@ def SAVE_CONFIGS(DATA):
 	try:
 		# Handle config.dat
 		DATA_PATH = GET_DATA_PATH()
-		CONFIG_FILE_PATH = f"{DATA_PATH}\\config.dat"
+		CONFIG_FILE_PATH = f"{DATA_PATH}//config.dat"
 
 		with open(CONFIG_FILE_PATH, "r") as CONFIG_FILE:
 			CONFIG_DATA = CONFIG_FILE.readlines()
@@ -301,7 +301,7 @@ def SAVE_CONFIGS(DATA):
 						NEW_VALUE = CONSTANTS[KEY]
 						if isinstance(NEW_VALUE, bool):
 							NEW_VALUE = "True" if NEW_VALUE else "False"
-						LINE = f"{KEY} = {NEW_VALUE}\n"
+						LINE = f"{KEY} = {NEW_VALUE}/n"
 				CONFIG_FILE.write(LINE)
 
 	except Exception as E:
@@ -352,7 +352,7 @@ def GET_CONFIGS():
 
 	try:
 		#prefs.txt
-		with open(f"{GET_DATA_PATH()}\\config.dat", "r") as CONSTANTS_FILE:
+		with open(f"{GET_DATA_PATH()}//config.dat", "r") as CONSTANTS_FILE:
 			CONSTANTS_DATA = CONSTANTS_FILE.readlines()
 			CONSTANTS = {}
 			
@@ -410,10 +410,10 @@ def GET_GAME_DATA(SHEETS_USED, PROCESS_SHEETS_USED=True):
 	HOSTILES, SUPPLIES, PROJECTILES, ITEMS = {}, {}, {}, {}
 	SHEET_LIST = []
 
-	HOSTILES_FILE = open(f"{DATA_PATH}\\hostiles.dat", "r")
-	SUPPLIES_FILE = open(f"{DATA_PATH}\\supplies.dat", "r")
-	PROJECTILES_FILE = open(f"{DATA_PATH}\\projectiles.dat", "r")
-	ITEMS_FILE = open(f"{DATA_PATH}\\items.dat", "r")
+	HOSTILES_FILE = open(f"{DATA_PATH}//hostiles.dat", "r")
+	SUPPLIES_FILE = open(f"{DATA_PATH}//supplies.dat", "r")
+	PROJECTILES_FILE = open(f"{DATA_PATH}//projectiles.dat", "r")
+	ITEMS_FILE = open(f"{DATA_PATH}//items.dat", "r")
 
 	HOSTILES_DATA = HOSTILES_FILE.readlines()
 	SUPPLIES_DATA = SUPPLIES_FILE.readlines()
@@ -882,7 +882,7 @@ class UI_ELEMENT():
 		self.DRAW_TEXT(UI_SURFACE, CURRENT_TEXT, ((self.TL_POSITION.X + 0.5*self.DIMENTIONS.X) - 6*len(CURRENT_TEXT), self.TL_POSITION.Y+(self.DIMENTIONS.Y/4)), self.DIMENTIONS.Y/2, self.TEXT_COLOUR)
 
 	def DRAW_TEXT(self, UI_SURFACE, TEXT, POSITION, FONT_SIZE, COLOUR):
-		FONT = PG.font.Font('src\\exct\\fonts\\PressStart2P-Regular.ttf', round(FONT_SIZE))
+		FONT = PG.font.Font('src//exct//fonts//PressStart2P-Regular.ttf', round(FONT_SIZE))
 		TEXT_SURFACE = FONT.render(str(TEXT), True, list(COLOUR))
 		UI_SURFACE.blit(TEXT_SURFACE, POSITION)
 
@@ -1304,8 +1304,8 @@ class ENEMY(PHYSICS_OBJECT):
 		NORMALS = FIND_CUBOID_NORMALS(POINTS)
 		BOUNDING_BOX_OBJ = BOUNDING_BOX(POSITION, POINTS)
 		MASS = TYPE_DATA[1]
-		#Textures would be loaded here, but that would mean circular imports to \imgs\texture_load.py\, so have been avoided.
-		#Textures are instead loaded outside of this class, and passed in. (Always defined outside of \utils.py\)
+		#Textures would be loaded here, but that would mean circular imports to /imgs/texture_load.py/, so have been avoided.
+		#Textures are instead loaded outside of this class, and passed in. (Always defined outside of /utils.py/)
 		super().__init__(ID, POSITION, ROTATION, NORMALS, BOUNDING_BOX_OBJ, MASS, TEXTURES)
 		self.TEXTURE_SHEETS_USED = TEXTURE_SHEETS_USED
 
@@ -1363,7 +1363,7 @@ class ENEMY(PHYSICS_OBJECT):
 					SPECIFIC_ITEM_DATA[2][0][0],				#Texture Sheet used
 				)
 			else:
-				log.ERROR("utils.py // <ENEMY>", f"Unknown item type; {ITEM}\n    Valid item types; {ITEMS_DATA.keys()}")
+				log.ERROR("utils.py // <ENEMY>", f"Unknown item type; {ITEM}/n    Valid item types; {ITEMS_DATA.keys()}")
 
 		return PHYS_DATA
 
