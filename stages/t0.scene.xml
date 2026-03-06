@@ -1,0 +1,121 @@
+<stage>
+    <!-- Hello, brave file explorer! -->
+    <!-- I have added this mini-tutorial of each object's formatting and required data to this file below. -->
+    <!-- Usually these files follow the format "scene-__.dat", such as here where ___ has been filled with "t0" -->
+    <!-- Feel free to manually edit the files following the format, but I have a specific scene-editing tool you can request to make it easier. -->
+    <!-- Happy creating! -->
+    
+    
+    <!-- Scene data example (// marks a comment, Blank lines ignored.) -->
+    <!-- The formats for each datatype; -->
+    <!-- '|' seperates sections of the data, such as object type (first hex digit) and coordinates etc. -->
+    <!-- Vectors, dimentions and coordinates must be in the format 'X, Y, Z' -->
+    <!-- All textures are hex-IDs, seperated by a single forward-slash '/' -->
+    <!-- Boolean Values are represented by T(rue) & F(alse), seperated by '.' -->
+    <!-- Lists are seperated by ':', and every item is taken as a string. -->
+    <!-- Integers, floats, strings and hex values are simply as they appear. -->
+    
+    <!-- Types of object (Usable in file); -->
+    <!-- 0, SCENE, scene-wide data, Sounds & skybox // Void-colour, sound file to play ambiently. -->
+    <!-- 1, PLAYER, player data & items // Start position, direction, list of item names. -->
+    <!-- 2, CUBE_STATIC // Centre location, Dimensions, bottom/side/top textures. -->
+    <!-- 3, QUAD // TL coordinate, BL coordinate, BR coordinate, TR coordinate, texture.//2, CUBE_STATIC // Centre location, Dimensions, bottom/side/top textures. -->
+    <!-- 4, TRI // TL coordinate, BL coordinate, BR coordinate, Collide-able, texture. -->
+    <!-- 5, SPRITE_STATIC, decoration // Centre location, texture. -->
+    <!-- 6, ITEM, gives something and disappears // Centre location, "what to give" (health, ammo) -->
+    <!-- 7, TRIGGER, Do "thing" when player touches (01 is prev. scene, 02 is next scene, etc.) // Centre location, Dimensions, Trigger-flag. -->
+    <!-- 8, INTERACTABLE, Like a button for player to use // TL coordinate, BL coordinate, BR coordinate, TR coordinate, Trigger-flag, texture. -->
+    <!-- 9, CUBE_PATH, Moving boxes for doors or similar // Position, Dimentions, Movement vector, Movement speed, Trigger-flag, bottom/side/top textures. -->
+    <!-- A, ENEMY, fights back // Start location, Facing direction, type. -->
+    <!-- B, CUBE_PHYSICS, Such as a box // Position, Dimentions, bottom/side/top textures. -->
+    <!-- C, LIGHT, Creates light at a point with intensity and colour. Can be toggled with the flag. // Location, Look-at position, Colour, Intensity, FOV, Max-distance, Toggle-flag. -->
+    <!-- D, NPC_PATH_NODE, Used for Enemy pathfinding with Dijkstra's Algorithm. // Location, flag, Connections (To other Nodes). -->
+    <!-- E, LOGIC, Logic gate for flag logic. // flagA TYPE flagB, outputFlag. -->
+    
+    <!-- Types of object (Unusable in file); -->
+    <!-- {16}, PROJECTILE, Not supported in file, only used by player/hostiles // NO_FILE_DATA. -->
+    <!-- {17}, EXPLOSION, Has a bounding box, and anything within is pushed away and "hurt" if possible // NO_FILE_DATA. -->
+    <!-- .. more. -->
+    
+    
+    <!-- Every scene MUST have the PLAYER object, as seen below. -->
+    <player position="10, 0, 0" direction="0, 0, 0" items="rl,laser,dbs" />
+    
+    
+    <!-- The real "meat and potatoes" of the file. -->
+    <!-- Holds all of the quads, tris, interactables, enemies, etc for the scene to place about as specified. -->
+    <!-- This section may get rather long; Feel free to split it up into smaller sections as I have here. -->
+    <!-- I do not reccomend trying to edit large scenes by hand this way, I expect it would get rather tedious after some time. -->
+    <!-- Actual scene contents; (Testing environment geometry) -->
+    <quad texture="1>02" collision="True"> <vertices v0="20, -1, -10" v1="-10, -1, -10" v2="-10, -1, 10" v3="20, -1, 10" /> </quad>
+    <cube-static position="0, 0.25, -2" dimensions="1, 1, 1" collision="True" bottomTexture="01" sideTexture="01" topTexture="01" />
+    <cube-static position="5, 2, -2" dimensions="1, 3, 1" collision="True" bottomTexture="01" sideTexture="01" topTexture="01" />
+    <quad texture="1>10" collision="True"> <vertices v0="1, -1, 0" v1="-3.2, 1, 0" v2="-3.2, 1, 3.2" v3="1, -1, 3.2" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="0.0, 1.0, 7.0" v1="2.5, 1.0, 7.0" v2="2.5, -1.0, 7.5" v3="0.0, -1.0, 7.5" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="0.0, -1.0, 7.5" v1="-2.5, -1.0, 7.5" v2="-2.5, 1.0, 7.5" v3="0.0, 1.0, 7.0" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="-5.0, -1.0, 7.5" v1="-2.5, -1.0, 7.5" v2="-2.5, 1.0, 7.5" v3="-5.0, 1.0, 7.5" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="-5, 3, -5" v1="-5, 2, -2.5" v2="-2.5, 2, -2.5" v3="-2.5, 3, -5" /> </quad>
+    <quad texture="02" collision="True"> <vertices v0="-5, 0, -5" v1="-5, 0, -2.5" v2="-2.5, 0, -2.5" v3="-2.5, 0, -5" /> </quad>
+    
+    
+    <!-- Triangle Testing. -->
+    <tri texture="07" collision="True"> <vertices v0="6, 0, -4" v1="5, 0, -5" v2="5.5, 1, -4.5" /> </tri>
+    
+    
+    <!-- Shallow slope testing (Physics). -->
+    <quad texture="07" collision="True"> <vertices v0="10, -1, 10" v1="9, -1, 10" v2="9, 100, 10000" v3="10, 100, 10000" /> </quad>
+    
+    
+    <!-- Light testing. -->
+    <light position="-5, 10, 0" look-at="0, 0, 0" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
+    
+    
+    
+    <!-- TRIGGER testing. -->
+    <trigger position="15, -0.25, 5" dimensions="1, 1, 1" flag="triggerTest" />
+    <cube-static position="15, -0.25, 5" dimensions="1, 1, 1" collision="False" bottomTexture="1>18" sideTexture="1>18" topTexture="1>18" />
+    <light position="13, 2, 5" look-at="15, 0.25, 5" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="7.5" flag="triggerTest" />
+    
+    
+    <!-- Physics Object testing. -->
+    <enemy position="-5, 1, 4" direction="-10, 0, 0" type="test" />
+    <sprite position="-5, -1, 3" texture="1, 1, 1" />
+    <cube-physics position="-5, 1, 5" dimensions="0.35, 1.5, 0.35" mass="10.0" bottomTexture="1>17" sideTexture="1>17" topTexture="1>17" />
+    <cube-physics position="-5, 1, 5.5" dimensions="0.35, 0.75, 0.35" mass="10.0" bottomTexture="1>17" sideTexture="1>17" topTexture="1>17" />
+    
+    
+    <!-- Button testing -->
+    <interactable flag="flag2" texture="1>09"> <vertices v0="15, -1, -7.5" v1="15, -1, -6.5" v2="15, 0, -6.5" v3="15, 0, -7.5" /> </interactable>
+    <interactable flag="flag3" texture="1>0A"> <vertices v0="15, -1, -6" v1="15, -1, -5" v2="15, 0, -5" v3="15, 0, -6" /> </interactable>
+    <light position="14, 5, -7" look-at="15, 0, -7" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag2" />
+    <light position="14, 5, -5.5" look-at="15, 0, -5.5" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag3" />
+    
+    
+    <!-- Logic gate testing -->
+    <logic type="AND" A="flag2" B="flag3" Q="flag4" />
+    <light position="14, 5, -1" look-at="15, 0, -1" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag4" />
+    
+    <logic type="NOT" A="flag2" B="" Q="flag5" />
+    <light position="14, 5, 1" look-at="15, 0, 1" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag5" />
+    
+    
+    <!-- CUBE_PATH testing -->
+    <interactable flag="doorTest" texture="1>0B"> <vertices v0="15, -1, -10" v1="15, -1, -8.5" v2="15, .5, -8.5" v3="15, .5, -10" /> </interactable>
+    <light position="10, 15, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
+    <light position="14, 5, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="doorTest" />
+    <quad texture="FF" collision="True"> <vertices v0="15, .5, -7.5" v1="15, 0, -7.5" v2="15, 0, -6.5" v3="15, .5, -6.5" /> </quad>
+    <quad texture="FF" collision="True"> <vertices v0="15, .5, -10" v1="15, 1, -10" v2="15, 1, -6.5" v3="15, .5, -6.5" /> </quad>
+    <cube-path position="15.06, -0.25, -8" dimensions="0.1, 1.5, 1" displacement="0, 0, -1" speed="0.05" flag="doorTest" bottomTexture="1>17" sideTexture="1>17" topTexture="1>17" />
+    
+    
+    <!-- Pathing node testing -->
+    <tri texture="00" collision="False"> <vertices v0="-5, 0, -5" v1="-5, 0, -4.75" v2="-5, -0.25, -4.875" /> </tri>
+    <node position="-5, -1, -4.875" name="node_1" connections="" />
+    
+    
+    <!-- Supplies Testing -->
+    <item position="09.25, 0, -9.5" type="small-health" />
+    <item position="09.75, 0, -9.5" type="large-health" />
+    <item position="10.25, 0, -9.5" type="small-energy" />
+    <item position="10.75, 0, -9.5" type="large-energy" />
+</stage>

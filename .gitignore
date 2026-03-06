@@ -1,0 +1,9 @@
+
+#Don't include compiled py module files, or pyc.
+*.so
+*.pyd
+__pycache__
+
+
+#Other
+notes.md
