@@ -105,8 +105,46 @@ def getVertices(XML:ET.Element) -> list[glm.vec3]:
 
 	return [];
 
-def getCubeVertsIndic(position:glm.vec3, dimensions:glm.vec3) -> tuple[list[glm.vec3], list[int]]:
-	return ([], []);
+def getCuboidVerticesIndices(position:glm.vec3, dimensions:glm.vec3) -> tuple[list[glm.vec3], list[int]]:
+	#Offsets in range [-1 ←→ +1], will be scaled & translated later.
+	#Could precalc offsets, but this feels clearer (?)
+	vertices:list[glm.vec3] = [
+		#Lower vertices
+		glm.vec3(-1.0, -1.0, -1.0),
+		glm.vec3( 1.0, -1.0, -1.0),
+		glm.vec3(-1.0,  1.0, -1.0),
+		glm.vec3( 1.0,  1.0, -1.0),
+
+		#Upper vertices
+		glm.vec3(-1.0, -1.0,  1.0),
+		glm.vec3( 1.0, -1.0,  1.0),
+		glm.vec3(-1.0,  1.0,  1.0),
+		glm.vec3( 1.0,  1.0,  1.0)
+	];
+
+	for i in range(8): #Scale, then translate the vertices.
+		vertices[i].x *= dimensions.x;
+		vertices[i].y *= dimensions.y;
+		vertices[i].z *= dimensions.z;
+
+		vertices[i].x += position.x;
+		vertices[i].y += position.y;
+		vertices[i].z += position.z;
+
+
+	indices:list[int] = [
+		#Horizontal faces
+		0,1,2, 1,2,3, #Lower face
+		4,5,6, 5,6,7, #Upper face
+
+		#Vertical faces
+		0,2,6, 0,4,6,
+		2,3,7, 2,6,7,
+		3,1,5, 3,5,7,
+		1,0,4, 1,5,4,
+	];
+
+	return (vertices, indices);
 
 
 
@@ -202,7 +240,7 @@ class Enemy(Sprite):
 
 class CubePhysics(Dynamic):
 	def __init__(self, position:glm.vec3, dimensions:glm.vec3, textures:list[str], mass:float):
-		(vertices, indices) = getCubeVertsIndic(position, dimensions);
+		(vertices, indices) = getCuboidVerticesIndices(position, dimensions);
 		super().__init__(type(self), position, vertices, indices, textures);
 		self.mass:float = mass;
 
@@ -231,7 +269,7 @@ class Interactable(Dynamic):
 
 class Trigger(Dynamic):
 	def __init__(self, position:glm.vec3, dimensions:glm.vec3, flag:str):
-		(vertices, indices) = getCubeVertsIndic(position, dimensions);
+		(vertices, indices) = getCuboidVerticesIndices(position, dimensions);
 		super().__init__(type(self), position, vertices, indices, {});
 		self.flag:str = flag;
 
@@ -248,7 +286,7 @@ class Trigger(Dynamic):
 
 class CubePath(Dynamic):
 	def __init__(self, position:glm.vec3, dimensions:glm.vec3, textures:list[str], displacement:glm.vec3, speed:float, flag:str):
-		(vertices, indices) = getCubeVertsIndic(position, dimensions);
+		(vertices, indices) = getCuboidVerticesIndices(position, dimensions);
 		super().__init__(type(self), position, vertices, indices, textures);
 		self.displacement:glm.vec3 = displacement;
 		self.speed:float = max(speed, glm.length(displacement)); #Don't let it try move further than its max.
@@ -307,7 +345,7 @@ class Static:
 
 class CubeStatic(Static):
 	def __init__(self, position:glm.vec3, dimensions:glm.vec3, texture:str, collision:bool):
-		(vertices, indices) = getCubeVertsIndic(position, dimensions);
+		(vertices, indices) = getCuboidVerticesIndices(position, dimensions);
 		super().__init__(type(self), vertices, indices, {"main": texture,}, collision);
 	
 	@classmethod

@@ -29,9 +29,8 @@ def main() -> None:
 		gl.is_window_open() and
 		(not gl.is_key_held(gl.KEY_ESCAPE))
 	): #While window should stay open;
-		gl.poll_events();
-
 		#Handle inputs.
+		gl.poll_events();
 		stage.player.handleInputs();
 
 		#Run Physics & logic
