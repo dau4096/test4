@@ -1,8 +1,10 @@
 "types.py"
 
-import glm, gl;
+import glm;
+import gl; #Import custom OpenGL wrapper module. [https://github.com/dau4096/py-graphics-module]
 import math as maths;
 from dataclasses import dataclass;
+
 import xml.etree.ElementTree as ET;
 if (__name__ == "__main__"):
 	#If run directly, for debugging.
@@ -51,6 +53,30 @@ class Player:
 		gl.set_new_camera_angle(self.cameraID, self.angle);
 
 		return glm.mat4(gl.get_matrix(gl.VIEW, self.cameraID));
+
+	def handleInputs(self) -> None:
+		#Read inputs, translate/rotate as necessary.
+		#Translation
+		forward:glm.vec3 = glm.vec3(maths.sin(self.angle.x), maths.cos(self.angle.x), 0.0) * C.MOVE_SPEED;
+		right:glm.vec3 = glm.vec3(-forward.y, forward.x, 0.0);
+		up:glm.vec3 = glm.vec3(0.0, 0.0, C.MOVE_SPEED);
+
+		if (gl.is_key_held(gl.KEY_W)): self.position += forward;
+		if (gl.is_key_held(gl.KEY_S)): self.position -= forward;
+		if (gl.is_key_held(gl.KEY_D)): self.position += right;
+		if (gl.is_key_held(gl.KEY_A)): self.position -= right;
+		if (gl.is_key_held(gl.KEY_E)): self.position += up;
+		if (gl.is_key_held(gl.KEY_Q)): self.position -= up;
+
+		#Rotation
+		if (gl.is_key_held(gl.KEY_1)): gl.show_cursor(); #Stop cursor control briefly.
+		else:
+			gl.hide_cursor();
+			cursorDelta:glm.vec2 = glm.vec2(gl.get_cursor_movement());
+			delta:glm.vec3 = glm.vec3(cursorDelta.x, -cursorDelta.y, 0.0);
+			self.angle += delta * C.CURSOR_SPEED;
+			self.angle.y = glm.clamp(self.angle.y, -maths.pi/2.0, maths.pi/2.0);
+
 
 	def __repr__(self) -> str:
 		return f"<Player [CameraID: {self.cameraID},    Pos: {tuple(self.position)},    Ang: {tuple(self.angle)}]>";

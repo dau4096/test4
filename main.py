@@ -8,6 +8,7 @@ import gl; #Import custom OpenGL wrapper module. [https://github.com/dau4096/py-
 from src import constants as C;
 from src import types as T;
 from src import graphics as R;
+from src import physics as P;
 from src import loader as L;
 
 
@@ -23,6 +24,7 @@ def main() -> None:
 	print("Loaded:", stage);
 
 
+	R.addEnvironment(stage.environment); #Static objects.
 	while (
 		gl.is_window_open() and
 		(not gl.is_key_held(gl.KEY_ESCAPE))
@@ -30,10 +32,17 @@ def main() -> None:
 		gl.poll_events();
 
 		#Handle inputs.
+		stage.player.handleInputs();
+
+		#Run Physics & logic
+		stage.logicGates = P.updateLogic(stage.logicGates);
+		(stage.dynamic, stage.player) = P.updatePhysics(stage.dynamic, stage.player);
 
 		#Render frame.
-		R.drawFrame(stage.player.cameraID);
+		R.updateDynamic(stage.dynamic); #Dynamic objects.
+		R.drawFrame(stage.player); #Render the frame
 
+		#Update window
 		gl.update_window();
 
 
