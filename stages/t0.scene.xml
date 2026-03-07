@@ -47,75 +47,75 @@
     <!-- This section may get rather long; Feel free to split it up into smaller sections as I have here. -->
     <!-- I do not reccomend trying to edit large scenes by hand this way, I expect it would get rather tedious after some time. -->
     <!-- Actual scene contents; (Testing environment geometry) -->
-    <quad texture="1>02" collision="True"> <vertices v0="20, -1, -10" v1="-10, -1, -10" v2="-10, -1, 10" v3="20, -1, 10" /> </quad>
-    <cube-static position="0, 0.25, -2" dimensions="1, 1, 1" collision="True"> <textures low="01" side="01" top="01" /> </cube-static>
-    <cube-static position="5, 2, -2" dimensions="1, 3, 1" collision="True"> <textures low="01" side="01" top="01" /> </cube-static>
-    <quad texture="1>10" collision="True"> <vertices v0="1, -1, 0" v1="-3.2, 1, 0" v2="-3.2, 1, 3.2" v3="1, -1, 3.2" /> </quad>
-    <quad texture="01" collision="True"> <vertices v0="0.0, 1.0, 7.0" v1="2.5, 1.0, 7.0" v2="2.5, -1.0, 7.5" v3="0.0, -1.0, 7.5" /> </quad>
-    <quad texture="01" collision="True"> <vertices v0="0.0, -1.0, 7.5" v1="-2.5, -1.0, 7.5" v2="-2.5, 1.0, 7.5" v3="0.0, 1.0, 7.0" /> </quad>
-    <quad texture="01" collision="True"> <vertices v0="-5.0, -1.0, 7.5" v1="-2.5, -1.0, 7.5" v2="-2.5, 1.0, 7.5" v3="-5.0, 1.0, 7.5" /> </quad>
-    <quad texture="01" collision="True"> <vertices v0="-5, 3, -5" v1="-5, 2, -2.5" v2="-2.5, 2, -2.5" v3="-2.5, 3, -5" /> </quad>
-    <quad texture="02" collision="True"> <vertices v0="-5, 0, -5" v1="-5, 0, -2.5" v2="-2.5, 0, -2.5" v3="-2.5, 0, -5" /> </quad>
+    <quad texture="1>02" collision="True"> <vertices v0="20, -10, -1" v1="-10, -10, -1" v2="-10, 10, -1" v3="20, 10, -1" /> </quad>
+    <cube-static position="0, -2, 0.25" dimensions="1, 1, 1" collision="True"> <textures low="01" side="01" top="01" /> </cube-static>
+    <cube-static position="5, -2, 2" dimensions="1, 1, 3" collision="True"> <textures low="01" side="01" top="01" /> </cube-static>
+    <quad texture="1>10" collision="True"> <vertices v0="1, 0, -1" v1="-3.2, 0, 1" v2="-3.2, 3.2, 1" v3="1, 3.2, -1" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="0.0, 7.0, 1.0" v1="2.5, 7.0, 1.0" v2="2.5, 7.5, -1.0" v3="0.0, 7.5, -1.0" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="0.0, 7.5, -1.0" v1="-2.5, 7.5, -1.0" v2="-2.5, 7.5, 1.0" v3="0.0, 7.0, 1.0" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="-5.0, 7.5, -1.0" v1="-2.5, 7.5, -1.0" v2="-2.5, 7.5, 1.0" v3="-5.0, 7.5, 1.0" /> </quad>
+    <quad texture="01" collision="True"> <vertices v0="-5, -5, 3" v1="-5, -2.5, 2" v2="-2.5, -2.5, 2" v3="-2.5, -5, 3" /> </quad>
+    <quad texture="02" collision="True"> <vertices v0="-5, -5, 0" v1="-5, -2.5, 0" v2="-2.5, -2.5, 0" v3="-2.5, -5, 0" /> </quad>
     
     
     <!-- Triangle Testing. -->
-    <tri texture="07" collision="True"> <vertices v0="6, 0, -4" v1="5, 0, -5" v2="5.5, 1, -4.5" /> </tri>
+    <tri texture="07" collision="True"> <vertices v0="6, -4, 0" v1="5, -5, 0" v2="5.5, -4.5, 1" /> </tri>
     
     
     <!-- Shallow slope testing (Physics). -->
-    <quad texture="07" collision="True"> <vertices v0="10, -1, 10" v1="9, -1, 10" v2="9, 100, 10000" v3="10, 100, 10000" /> </quad>
+    <quad texture="07" collision="True"> <vertices v0="10, 10, -1" v1="9, 10, -1" v2="9, 10000, 100" v3="10, 10000, 100" /> </quad>
     
     
     <!-- Light testing. -->
-    <light position="-5, 10, 0" look-at="0, 0, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
+    <light position="-5, 0, 10" look-at="0, 0, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
     
     
     
     <!-- TRIGGER testing. -->
-    <trigger position="15, -0.25, 5" dimensions="1, 1, 1" flag="triggerTest" />
-    <cube-static position="15, -0.25, 5" dimensions="1, 1, 1" collision="False"> <textures low="1>18" side="1>18" top="1>18" /> </cube-static>
-    <light position="13, 2, 5" look-at="15, 0.25, 5" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="7.5" flag="triggerTest" />
+    <trigger position="15, 5, -0.25" dimensions="1, 1, 1" flag="triggerTest" />
+    <cube-static position="15, 5, -0.25" dimensions="1, 1, 1" collision="False"> <textures low="1>18" side="1>18" top="1>18" /> </cube-static>
+    <light position="13, 5, 2" look-at="15, 5, 0.25" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="7.5" flag="triggerTest" />
     
     
     <!-- Physics Object testing. -->
-    <enemy position="-5, 1, 4" direction="-10, 0, 0" type="test" />
-    <sprite position="-5, -1, 3" texture="1, 1, 1" />
-    <cube-physics position="-5, 1, 5" dimensions="0.35, 1.5, 0.35" mass="10.0"> <textures low="1>17" side="1>17" top="1>17" /> </cube-physics>
-    <cube-physics position="-5, 1, 5.5" dimensions="0.35, 0.75, 0.35" mass="10.0"> <textures low="1>17" side="1>17" top="1>17" /> </cube-physics>
+    <enemy position="-5, 4, 1" direction="-10, 0, 0" type="test" />
+    <sprite position="-5, 3, -1" texture="1, 1, 1" />
+    <cube-physics position="-5, 5, 1" dimensions="0.35, 0.35, 1.5" mass="10.0"> <textures low="1>17" side="1>17" top="1>17" /> </cube-physics>
+    <cube-physics position="-5, 5.5, 1" dimensions="0.35, 0.35, 0.75" mass="10.0"> <textures low="1>17" side="1>17" top="1>17" /> </cube-physics>
     
     
     <!-- Button testing -->
-    <interactable flag="flag2" texture="1>09"> <vertices v0="15, -1, -7.5" v1="15, -1, -6.5" v2="15, 0, -6.5" v3="15, 0, -7.5" /> </interactable>
-    <interactable flag="flag3" texture="1>0A"> <vertices v0="15, -1, -6" v1="15, -1, -5" v2="15, 0, -5" v3="15, 0, -6" /> </interactable>
-    <light position="14, 5, -7" look-at="15, 0, -7" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag2" />
-    <light position="14, 5, -5.5" look-at="15, 0, -5.5" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag3" />
+    <interactable flag="flag2" texture="1>09"> <vertices v0="15, -7.5, -1" v1="15, -6.5, -1" v2="15, -6.5, 0" v3="15, -7.5, 0" /> </interactable>
+    <interactable flag="flag3" texture="1>0A"> <vertices v0="15, -6, -1" v1="15, -5, -1" v2="15, -5, 0" v3="15, -6, 0" /> </interactable>
+    <light position="14, -7, 5" look-at="15, -7, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag2" />
+    <light position="14, -5.5, 5" look-at="15, -5.5, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag3" />
     
     
     <!-- Logic gate testing -->
     <logic-gate type="AND" A="flag2" B="flag3" Q="flag4" />
-    <light position="14, 5, -1" look-at="15, 0, -1" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag4" />
+    <light position="14, -1, 5" look-at="15, -1, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag4" />
     
     <logic-gate type="NOT" A="flag2" B="" Q="flag5" />
-    <light position="14, 5, 1" look-at="15, 0, 1" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag5" />
+    <light position="14, 1, 5" look-at="15, 1, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag5" />
     
     
     <!-- CUBE_PATH testing -->
-    <interactable flag="doorTest" texture="1>0B"> <vertices v0="15, -1, -10" v1="15, -1, -8.5" v2="15, .5, -8.5" v3="15, .5, -10" /> </interactable>
-    <light position="10, 15, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
-    <light position="14, 5, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="doorTest" />
-    <quad texture="FF" collision="True"> <vertices v0="15, .5, -7.5" v1="15, 0, -7.5" v2="15, 0, -6.5" v3="15, .5, -6.5" /> </quad>
-    <quad texture="FF" collision="True"> <vertices v0="15, .5, -10" v1="15, 1, -10" v2="15, 1, -6.5" v3="15, .5, -6.5" /> </quad>
-    <cube-path position="15.06, -0.25, -8" dimensions="0.1, 1.5, 1" displacement="0, 0, -1" speed="0.05" flag="doorTest"> <textures low="1>17" side="1>17" top="1>17" /> </cube-path>
+    <interactable flag="doorTest" texture="1>0B"> <vertices v0="15, -10, -1" v1="15, -8.5, -1" v2="15, -8.5, .5" v3="15, -10, .5" /> </interactable>
+    <light position="10, -9.25, 15" look-at="15, -9.25, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
+    <light position="14, -9.25, 5" look-at="15, -9.25, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="doorTest" />
+    <quad texture="FF" collision="True"> <vertices v0="15, -7.5, .5" v1="15, -7.5, 0" v2="15, -6.5, 0" v3="15, -6.5, .5" /> </quad>
+    <quad texture="FF" collision="True"> <vertices v0="15, -10, .5" v1="15, -10, 1" v2="15, -6.5, 1" v3="15, -6.5, .5" /> </quad>
+    <cube-path position="15.06, -8, -0.25" dimensions="0.1, 1, 1.5" displacement="0, -1, 0" speed="0.05" flag="doorTest"> <textures low="1>17" side="1>17" top="1>17" /> </cube-path>
     
     
     <!-- Pathing node testing -->
-    <tri texture="00" collision="False"> <vertices v0="-5, 0, -5" v1="-5, 0, -4.75" v2="-5, -0.25, -4.875" /> </tri>
-    <node position="-5, -1, -4.875" name="node_1" connections="" />
+    <tri texture="00" collision="False"> <vertices v0="-5, -5, 0" v1="-5, -4.75, 0" v2="-5, -4.875, -0.25" /> </tri>
+    <node position="-5, -4.875, -1" name="node_1" connections="" />
     
     
     <!-- Supplies Testing -->
-    <item position="09.25, 0, -9.5" type="small-health" />
-    <item position="09.75, 0, -9.5" type="large-health" />
-    <item position="10.25, 0, -9.5" type="small-energy" />
-    <item position="10.75, 0, -9.5" type="large-energy" />
+    <item position="09.25, -9.5, 0" type="small-health" />
+    <item position="09.75, -9.5, 0" type="large-health" />
+    <item position="10.25, -9.5, 0" type="small-energy" />
+    <item position="10.75, -9.5, 0" type="large-energy" />
 </stage>

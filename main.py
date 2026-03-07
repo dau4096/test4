@@ -13,15 +13,15 @@ from src import loader as L;
 
 
 def main() -> None:
-	gl.set_output(gl.DEBUG); #Debugging.
+	gl.set_output(gl.SILENT); #Debugging.
 	gl.init(name="test4/rewrite26", resolution=C.RESOLUTION, version=(4, 6));
 	gl.configure(gl.WORLDSPACE);
 
-	R.init();
 	stage:[L.Stage|None] = L.loadFile(C.FILE_PATH);
 	if (stage is None):
 		raise ValueError("Could not load stage.");
 	print("Loaded:", stage);
+	R.init(stage.player.cameraID);
 
 
 	R.addEnvironment(stage.environment); #Static objects.
@@ -45,6 +45,8 @@ def main() -> None:
 		gl.update_window();
 
 
+	gl.delete_camera(stage.player.cameraID);
+	gl.terminate(); #Close after.
 
 
 

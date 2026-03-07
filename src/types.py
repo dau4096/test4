@@ -58,7 +58,7 @@ class Player:
 		#Read inputs, translate/rotate as necessary.
 		#Translation
 		forward:glm.vec3 = glm.vec3(maths.sin(self.angle.x), maths.cos(self.angle.x), 0.0) * C.MOVE_SPEED;
-		right:glm.vec3 = glm.vec3(-forward.y, forward.x, 0.0);
+		right:glm.vec3 = glm.vec3(forward.y, -forward.x, 0.0);
 		up:glm.vec3 = glm.vec3(0.0, 0.0, C.MOVE_SPEED);
 
 		if (gl.is_key_held(gl.KEY_W)): self.position += forward;
@@ -192,7 +192,7 @@ class Dynamic:
 
 class Sprite(Dynamic):
 	def __init__(self, position:glm.vec3, dimensions:glm.vec2, texture:str):
-		super().__init__(type(self), position, [], [0,1,2,1,2,3], {"main": texture,});
+		super().__init__(type(self), position, [], [0,1,2, 1,2,3], {"main": texture,});
 
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
@@ -376,7 +376,7 @@ class Tri(Static):
 
 class Quad(Static):
 	def __init__(self, vertices:list[glm.vec3], texture:str, collision:bool):
-		super().__init__(type(self), vertices, [0,1,2, 1,2,3], {"main": texture,}, collision);
+		super().__init__(type(self), vertices, [0,1,2, 2,3,0], {"main": texture,}, collision);
 	
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
