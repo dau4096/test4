@@ -39,7 +39,7 @@
     
     
     <!-- Every scene MUST have the PLAYER object, as seen below. -->
-    <player position="10, 0, 0" direction="0, 0, 0" items="rl,laser,dbs" />
+    <player position="10, 0, 0" angle="0, 0, 0" items="rl,laser,dbs" />
     
     
     <!-- The real "meat and potatoes" of the file. -->
@@ -48,8 +48,8 @@
     <!-- I do not reccomend trying to edit large scenes by hand this way, I expect it would get rather tedious after some time. -->
     <!-- Actual scene contents; (Testing environment geometry) -->
     <quad texture="1>02" collision="True"> <vertices v0="20, -1, -10" v1="-10, -1, -10" v2="-10, -1, 10" v3="20, -1, 10" /> </quad>
-    <cube-static position="0, 0.25, -2" dimensions="1, 1, 1" collision="True" bottomTexture="01" sideTexture="01" topTexture="01" />
-    <cube-static position="5, 2, -2" dimensions="1, 3, 1" collision="True" bottomTexture="01" sideTexture="01" topTexture="01" />
+    <cube-static position="0, 0.25, -2" dimensions="1, 1, 1" collision="True"> <textures low="01" side="01" top="01" /> </cube-static>
+    <cube-static position="5, 2, -2" dimensions="1, 3, 1" collision="True"> <textures low="01" side="01" top="01" /> </cube-static>
     <quad texture="1>10" collision="True"> <vertices v0="1, -1, 0" v1="-3.2, 1, 0" v2="-3.2, 1, 3.2" v3="1, -1, 3.2" /> </quad>
     <quad texture="01" collision="True"> <vertices v0="0.0, 1.0, 7.0" v1="2.5, 1.0, 7.0" v2="2.5, -1.0, 7.5" v3="0.0, -1.0, 7.5" /> </quad>
     <quad texture="01" collision="True"> <vertices v0="0.0, -1.0, 7.5" v1="-2.5, -1.0, 7.5" v2="-2.5, 1.0, 7.5" v3="0.0, 1.0, 7.0" /> </quad>
@@ -67,45 +67,45 @@
     
     
     <!-- Light testing. -->
-    <light position="-5, 10, 0" look-at="0, 0, 0" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
+    <light position="-5, 10, 0" look-at="0, 0, 0" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
     
     
     
     <!-- TRIGGER testing. -->
     <trigger position="15, -0.25, 5" dimensions="1, 1, 1" flag="triggerTest" />
-    <cube-static position="15, -0.25, 5" dimensions="1, 1, 1" collision="False" bottomTexture="1>18" sideTexture="1>18" topTexture="1>18" />
-    <light position="13, 2, 5" look-at="15, 0.25, 5" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="7.5" flag="triggerTest" />
+    <cube-static position="15, -0.25, 5" dimensions="1, 1, 1" collision="False"> <textures low="1>18" side="1>18" top="1>18" /> </cube-static>
+    <light position="13, 2, 5" look-at="15, 0.25, 5" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="7.5" flag="triggerTest" />
     
     
     <!-- Physics Object testing. -->
     <enemy position="-5, 1, 4" direction="-10, 0, 0" type="test" />
     <sprite position="-5, -1, 3" texture="1, 1, 1" />
-    <cube-physics position="-5, 1, 5" dimensions="0.35, 1.5, 0.35" mass="10.0" bottomTexture="1>17" sideTexture="1>17" topTexture="1>17" />
-    <cube-physics position="-5, 1, 5.5" dimensions="0.35, 0.75, 0.35" mass="10.0" bottomTexture="1>17" sideTexture="1>17" topTexture="1>17" />
+    <cube-physics position="-5, 1, 5" dimensions="0.35, 1.5, 0.35" mass="10.0"> <textures low="1>17" side="1>17" top="1>17" /> </cube-physics>
+    <cube-physics position="-5, 1, 5.5" dimensions="0.35, 0.75, 0.35" mass="10.0"> <textures low="1>17" side="1>17" top="1>17" /> </cube-physics>
     
     
     <!-- Button testing -->
     <interactable flag="flag2" texture="1>09"> <vertices v0="15, -1, -7.5" v1="15, -1, -6.5" v2="15, 0, -6.5" v3="15, 0, -7.5" /> </interactable>
     <interactable flag="flag3" texture="1>0A"> <vertices v0="15, -1, -6" v1="15, -1, -5" v2="15, 0, -5" v3="15, 0, -6" /> </interactable>
-    <light position="14, 5, -7" look-at="15, 0, -7" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag2" />
-    <light position="14, 5, -5.5" look-at="15, 0, -5.5" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag3" />
+    <light position="14, 5, -7" look-at="15, 0, -7" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag2" />
+    <light position="14, 5, -5.5" look-at="15, 0, -5.5" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag3" />
     
     
     <!-- Logic gate testing -->
-    <logic type="AND" A="flag2" B="flag3" Q="flag4" />
-    <light position="14, 5, -1" look-at="15, 0, -1" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag4" />
+    <logic-gate type="AND" A="flag2" B="flag3" Q="flag4" />
+    <light position="14, 5, -1" look-at="15, 0, -1" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag4" />
     
-    <logic type="NOT" A="flag2" B="" Q="flag5" />
-    <light position="14, 5, 1" look-at="15, 0, 1" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag5" />
+    <logic-gate type="NOT" A="flag2" B="" Q="flag5" />
+    <light position="14, 5, 1" look-at="15, 0, 1" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="flag5" />
     
     
     <!-- CUBE_PATH testing -->
     <interactable flag="doorTest" texture="1>0B"> <vertices v0="15, -1, -10" v1="15, -1, -8.5" v2="15, .5, -8.5" v3="15, .5, -10" /> </interactable>
-    <light position="10, 15, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
-    <light position="14, 5, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="doorTest" />
+    <light position="10, 15, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="90.0" range="25.0" flag="CONST_ON" />
+    <light position="14, 5, -9.25" look-at="15, 0, -9.25" colour="1.0, 1.0, 1.0" intensity="1.0" FOV="45.0" range="10.0" flag="doorTest" />
     <quad texture="FF" collision="True"> <vertices v0="15, .5, -7.5" v1="15, 0, -7.5" v2="15, 0, -6.5" v3="15, .5, -6.5" /> </quad>
     <quad texture="FF" collision="True"> <vertices v0="15, .5, -10" v1="15, 1, -10" v2="15, 1, -6.5" v3="15, .5, -6.5" /> </quad>
-    <cube-path position="15.06, -0.25, -8" dimensions="0.1, 1.5, 1" displacement="0, 0, -1" speed="0.05" flag="doorTest" bottomTexture="1>17" sideTexture="1>17" topTexture="1>17" />
+    <cube-path position="15.06, -0.25, -8" dimensions="0.1, 1.5, 1" displacement="0, 0, -1" speed="0.05" flag="doorTest"> <textures low="1>17" side="1>17" top="1>17" /> </cube-path>
     
     
     <!-- Pathing node testing -->

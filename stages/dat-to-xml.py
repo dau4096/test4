@@ -3,6 +3,9 @@
 
 
 
+def V4toV3(V4:str) -> str:
+	return ", ".join(V4.split(", ")[:-1]);
+
 
 ######## FORMATTING FUNCS ########
 def SCENE(parts:list[str]) -> str: #0
@@ -12,13 +15,13 @@ def SCENE(parts:list[str]) -> str: #0
 
 def PLAYER(parts:list[str]) -> str: #1
 	#1, PLAYER, player data & items // Start position, direction, list of item names.
-	return f'<player position="{parts[0]}" direction="{parts[1]}" items="{parts[2].replace(":",",")}" />';
+	return f'<player position="{parts[0]}" angle="{parts[1]}" items="{parts[2].replace(":",",")}" />';
 
 
 def CUBE_STATIC(parts:list[str]) -> str: #2
 	#2, CUBE_STATIC // Centre location, Dimensions, bottom/side/top textures.
 	textures:list[str] = parts[3].split("/");
-	return f'<cube-static position="{parts[0]}" dimensions="{parts[1]}" collision="{parts[2]=="T"}" bottomTexture="{textures[0]}" sideTexture="{textures[1]}" topTexture="{textures[2]}" />';
+	return f'<cube-static position="{parts[0]}" dimensions="{parts[1]}" collision="{parts[2]=="T"}"> <textures low="{textures[0]}" side="{textures[1]}" top="{textures[2]}" /> </cube-static>';
 
 
 def QUAD(parts:list[str]) -> str: #3
@@ -54,7 +57,7 @@ def INTERACTABLE(parts:list[str]) -> str: #8
 def CUBE_PATH(parts:list[str]) -> str: #9
 	#9, CUBE_PATH, Moving boxes for doors or similar // Position, Dimentions, Movement vector, Movement speed, Trigger-flag, bottom/side/top textures.
 	textures:list[str] = parts[5].split("/");
-	return f'<cube-path position="{parts[0]}" dimensions="{parts[1]}" displacement="{parts[2]}" speed="{parts[3]}" flag="{parts[4]}" bottomTexture="{textures[0]}" sideTexture="{textures[1]}" topTexture="{textures[2]}" />';
+	return f'<cube-path position="{parts[0]}" dimensions="{parts[1]}" displacement="{parts[2]}" speed="{parts[3]}" flag="{parts[4]}"> <textures low="{textures[0]}" side="{textures[1]}" top="{textures[2]}" /> </cube-path>';
 
 
 def ENEMY(parts:list[str]) -> str: #A|10
@@ -65,12 +68,12 @@ def ENEMY(parts:list[str]) -> str: #A|10
 def CUBE_PHYSICS(parts:list[str]) -> str: #B|11
 	#B, CUBE_PHYSICS, Such as a box // Position, Dimentions, bottom/side/top textures.
 	textures:list[str] = parts[3].split("/");
-	return f'<cube-physics position="{parts[0]}" dimensions="{parts[1]}" mass="{parts[2]}" bottomTexture="{textures[0]}" sideTexture="{textures[1]}" topTexture="{textures[2]}" />';
+	return f'<cube-physics position="{parts[0]}" dimensions="{parts[1]}" mass="{parts[2]}"> <textures low="{textures[0]}" side="{textures[1]}" top="{textures[2]}" /> </cube-physics>';
 
 
 def LIGHT(parts:list[str]) -> str: #C|12
 	#C, LIGHT, Creates light at a point with intensity and colour. Can be toggled with the flag. // Location, Look-at position, Colour, Intensity, FOV, Max-distance, Toggle-flag.
-	return f'<light position="{parts[0]}" look-at="{parts[1]}" colour="{parts[2]}" intensity="{parts[3]}" FOV="{parts[4]}" range="{parts[5]}" flag="{parts[6]}" />';
+	return f'<light position="{parts[0]}" look-at="{parts[1]}" colour="{V4toV3(parts[2])}" intensity="{parts[3]}" FOV="{parts[4]}" range="{parts[5]}" flag="{parts[6]}" />';
 
 
 def NPC_PATH_NODE(parts:list[str]) -> str: #D|13
@@ -82,7 +85,7 @@ def LOGIC(parts:list[str]) -> str: #E|14
 	#E, LOGIC, Logic gate for flag logic. // flagA TYPE flagB, outputFlag.
 	operation:list[str] = parts[0].split(" ");
 	if (len(operation) == 2): operation = [operation[1], operation[0], ""];
-	return f'<logic type="{operation[1]}" A="{operation[0]}" B="{operation[2]}" Q="{parts[1]}" />';
+	return f'<logic-gate type="{operation[1]}" A="{operation[0]}" B="{operation[2]}" Q="{parts[1]}" />';
 ######## FORMATTING FUNCS ########
 
 

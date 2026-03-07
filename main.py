@@ -6,6 +6,7 @@ import gl; #Import custom OpenGL wrapper module. [https://github.com/dau4096/py-
 
 #Import other files;
 from src import constants as C;
+from src import types as T;
 from src import graphics as R;
 from src import loader as L;
 
@@ -16,9 +17,11 @@ def main() -> None:
 	gl.configure(gl.WORLDSPACE);
 
 	R.init();
-	L.loadFile(C.FILE_PATH);
+	stage:[L.Stage|None] = L.loadFile(C.FILE_PATH);
+	if (stage is None):
+		raise ValueError("Could not load stage.");
+	print("Loaded:", stage);
 
-	cameraID:int = gl.create_camera(fov_deg=70.0, near_z=0.1, far_z=100.0);
 
 	while (
 		gl.is_window_open() and
@@ -29,7 +32,7 @@ def main() -> None:
 		#Handle inputs.
 
 		#Render frame.
-		R.drawFrame(cameraID);
+		R.drawFrame(stage.player.cameraID);
 
 		gl.update_window();
 
