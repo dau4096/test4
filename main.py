@@ -20,13 +20,13 @@ def main() -> None:
 	stage:[L.Stage|None] = L.loadFile(C.FILE_PATH);
 	if (stage is None):
 		raise ValueError("Could not load stage.");
-	print("Loaded:", stage);
+	#print("Loaded:", stage);
 	R.init(stage.player.cameraID);
 
 
 	R.addEnvironment(stage.environment); #Static objects.
 	while (
-		gl.is_window_open() and
+		 gl.is_window_open() and
 		(not gl.is_key_held(gl.KEY_ESCAPE))
 	): #While window should stay open;
 		#Handle inputs.

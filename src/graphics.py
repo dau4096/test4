@@ -36,35 +36,77 @@ def init(cameraID:int) -> None:
 	shaders["dynamic"] = gl.load_shader(gl.WORLDSPACE, vertex="src/shaders/worldspace.vert", fragment="src/shaders/uv.3D.frag");
 
 
+	#Environment texture sheet
+	textures[C.ENV_TEXTURE_SHEET] = gl.load_texture(f"textures/{C.ENV_TEXTURE_SHEET}.sheet.png", C.ENV_TEXTURE_SHEET);
+	gl.add_texture(shaders["environment"], textures[C.ENV_TEXTURE_SHEET], 0);
 
-def getUV(object:[T.Static|T.Dynamic], i:int) -> tuple[float, float]:
+
+	for (i, texName) in enumerate(("hostiles", "sprites", "transparent")): #T.Dynamic texture sets.
+		if (texName not in textures.keys()):
+			textures[texName] = gl.load_texture(f"textures/{texName}.sheet.png", texName);
+		gl.add_texture(shaders["dynamic"], textures[texName], i);
+
+
+
+
+
+def getUV(object:[T.Static|T.Dynamic], triIdx:int, vIdx:int) -> tuple[float, float]:
+	texStr:str = "00"; #String rep, [00] → (0, 0) / [F0] → (15, 0) / HEX
+	uvIdx:int = (0,1,2, 2,3,0)[vIdx%6];
+
+	if (type(object) in (
+		T.Quad, T.Tri, T.Sprite, T.Item,
+	)): #Objects with 1 texture ("main")
+		texStr = object.textures["main"];
+	elif (type(object) in (
+		T.CubeStatic, T.CubePath, T.CubePhysics,
+	)): #Object with 3 textures ("low", "side", "top")
+		texName:str = "side";
+		if (triIdx<2): texName = "low";
+		elif (triIdx<4): texName = "top";
+		texStr = object.textures[texName];
+	else:
+		texStr = "00"; #Unknown, just use some default [00]/(0, 0) UV.\
+
+
+	#Convert string rep into int rep.
+	texID:glm.ivec2 = glm.ivec2(
+		int(texStr[1], 16), int(texStr[0], 16)
+	);
+
+	#16x16 textures per sheet.
+	LOW:glm.vec2  = glm.vec2(texID) / 16.0;
+	HIGH:glm.vec2 = glm.vec2(texID + 1) / 16.0;
 	return (
-		(0.0, 0.0),
-		(0.0, 1.0),
-		(1.0, 1.0),
-		(1.0, 0.0),
-	)[i%4]; #TBA
-
+		(LOW.x,  1.0-LOW.y),
+		(HIGH.x, 1.0-LOW.y),
+		(HIGH.x, 1.0-HIGH.y),
+		(LOW.x,  1.0-HIGH.y),
+	)[uvIdx];
 
 
 def addEnvironment(environment:list[T.Static]) -> None:
-	#Add all environmental objects to that VAO.
-	vertices:list[glm.vec3] = [];
+	vertices:list[float] = [];
 	indices:list[int] = [];
-
 	base:int = 0;
+
 	for object in environment:
-		if (type(object) == T.Light): continue; #Don't try to add this, its not a "proper" T.Static derivative class.
+		if (type(object) == T.Light): continue; #No mesh to draw.
 
-		#Modify to add texture UV values.
-		for (i, V) in enumerate(object.vertices):
-			vertices.extend(list(V)); #X/Y/Z
-			vertices.extend(getUV(object, i)); #U/V
+		triIdx = 0;
+		for t in range(
+			0, len(object.indices), 3
+		): #Process triangles
+			for i in range(3):
+				vIDX = object.indices[t+i];
+				V = object.vertices[vIDX];
 
-		for I in object.indices:
-			#Convert from "local" indices (start at 0) to the "global" indices (Counted for the entire vertices dataset)
-			indices.append(base + I);
-		base += len(object.vertices);
+				vertices.extend(list(V)); #X/Y/Z
+				vertices.extend(getUV(object, triIdx, i + (3*triIdx))); #U/V
+
+			triIdx += 1;
+			indices.extend([base, base+1, base+2]);
+			base += 3;
 
 	gl.add_vao(shaders["environment"], gl.POS_UV2D, vertices, indices);
 

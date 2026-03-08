@@ -3,6 +3,7 @@
 import xml.etree.ElementTree as ET;
 from dataclasses import dataclass;
 import gl; #Import custom OpenGL wrapper module. [https://github.com/dau4096/py-graphics-module]
+import glm;
 
 if (__name__ == "__main__"):
 	#If run directly, for debugging.
@@ -18,11 +19,22 @@ else:
 	from src import logicGates as G;
 
 
+#Stores stage specific meta-data.
+@dataclass
+class Meta:
+	filePath:str;
+	skyColour:glm.uvec3;
+
+	@classmethod
+	def fromXML(cls, XML:ET.Element, filePath:str=""):
+		attr:dict[str,str] = XML.attrib;
+		return cls(filePath, vec3(attr["skyColour"]) / 255.0);
+
 
 #Pseudo-struct style class for storing stage data.
 @dataclass
 class Stage:
-	filePath:str;
+	meta:Meta;				  	  #Meta info about the stage (Like void colour.)
 	environment:list[T.Static];   #List of all static objects in the stage.
 	dynamic:list[T.Dynamic];      #List of all dynamic objects in the stage.
 	graph:N.Graph;                #Graph to be pathfind(ed)-through.
@@ -31,20 +43,21 @@ class Stage:
 
 	def __repr__(self) -> str:
 		return f"""<Stage [
-	FilePath: \"{self.filePath}\",
+	FilePath: \"{self.meta.filePath}\",
 	Number of T.Static derived: {len(self.environment)},    Number of T.Dynamic derived: {len(self.dynamic)},
 	NodeGraph: {self.graph},
 	Gates: (
         {'\n        '.join([repr(lG) for lG in self.logicGates])}
 	),
 	Player: {self.player}
+	Sky-Colour: {list(glm.ivec3(self.meta.skyColour * 255.0))}
 ]>""";
 
 
 
 #Maps each XML tag type to a class/typedef.
 TYPE_MAP:dict[str,[T.Static|T.Dynamic]] = {
-	"scene": T.Scene, "player": T.Player,
+	"scene": Meta, "player": T.Player,
 	"cube-static": T.CubeStatic,
 	"quad": T.Quad, "tri": T.Tri,
 	"sprite": T.Sprite, "item": T.Item,
@@ -94,6 +107,8 @@ def loadFile(filePath:str) -> Stage|None:
 	graph:N.Graph = N.Graph(); #Create empty graph.
 	logicGates:list[G.LogicGate] = [];
 	playerInitial:T.PlayerInitial = None;
+	meta:Meta = None;
+
 	for objectXML in rootNode:
 		#Process each node in the file.
 		tag:str = objectXML.tag;
@@ -102,11 +117,16 @@ def loadFile(filePath:str) -> Stage|None:
 		elif (tag == "logic-gate"): logicGates.append(createObject(objectXML));		#Logic gates
 		elif (tag == "node"): graph.addNode(createObject(objectXML));				#Pathfinding graph nodes.
 		elif (tag == "player"): playerInitial = T.PlayerInitial.fromXML(objectXML);	#Player start values.
+		elif (tag == "meta"): meta = Meta.fromXML(objectXML, filePath=filePath);
 		else: #Unknown
 			print(f"Unknown node type: {tag}");
 			return None;
 
+
 	cameraID:int = gl.create_camera(fov_deg=70.0, near_z=0.1, far_z=100.0);
 	player:T.Player = T.Player(cameraID, playerInitial);
 
-	return Stage(filePath, environment, dynamic, graph, logicGates, player);
+	if (meta is None): #No node given. Use defaults.
+		meta = Meta(filePath, C.DEFAULT_SKY_COLOUR);
+
+	return Stage(meta, environment, dynamic, graph, logicGates, player);

@@ -15,7 +15,7 @@ def v3(v:str) -> str:
 ######## FORMATTING FUNCS ########
 def SCENE(parts:list[str]) -> str: #0
 	#0, SCENE, scene-wide data, Sounds & skybox // Void-colour, sound file to play ambiently.
-	return f'<scene skyColour="{parts[0]}" ambientSound="{parts[1]}" />';
+	return f'<meta skyColour="{parts[0]}" ambientSound="{parts[1]}" />';
 
 
 def PLAYER(parts:list[str]) -> str: #1
@@ -25,23 +25,23 @@ def PLAYER(parts:list[str]) -> str: #1
 
 def CUBE_STATIC(parts:list[str]) -> str: #2
 	#2, CUBE_STATIC // Centre location, Dimensions, bottom/side/top textures.
-	textures:list[str] = parts[3].split("/");
+	textures:list[str] = [x.split(">")[-1] for x in parts[3].split("/")];
 	return f'<cube-static position="{v3(parts[0])}" dimensions="{v3(parts[1])}" collision="{parts[2]=="T"}"> <textures low="{textures[0]}" side="{textures[1]}" top="{textures[2]}" /> </cube-static>';
 
 
 def QUAD(parts:list[str]) -> str: #3
 	#3, QUAD // TL coordinate, BL coordinate, BR coordinate, TR coordinate, texture.
-	return f'<quad texture="{parts[5]}" collision="{parts[4]=="T"}"> <vertices v0="{v3(parts[0])}" v1="{v3(parts[1])}" v2="{v3(parts[2])}" v3="{v3(parts[3])}" /> </quad>';
+	return f'<quad texture="{parts[5].split(">")[-1]}" collision="{parts[4]=="T"}"> <vertices v0="{v3(parts[0])}" v1="{v3(parts[1])}" v2="{v3(parts[2])}" v3="{v3(parts[3])}" /> </quad>';
 
 
 def TRI(parts:list[str]) -> str: #4
 	#4, TRI // TL coordinate, BL coordinate, BR coordinate, Collide-able, texture.
-	return f'<tri texture="{parts[4]}" collision="{parts[3]=="T"}"> <vertices v0="{v3(parts[0])}" v1="{v3(parts[1])}" v2="{v3(parts[2])}" /> </tri>';
+	return f'<tri texture="{parts[4].split(">")[-1]}" collision="{parts[3]=="T"}"> <vertices v0="{v3(parts[0])}" v1="{v3(parts[1])}" v2="{v3(parts[2])}" /> </tri>';
 
 
 def SPRITE_STATIC(parts:list[str]) -> str: #5
 	#5, SPRITE_STATIC, decoration // Centre location, texture.
-	return f'<sprite position="{v3(parts[0])}" texture="{parts[1]}" />';
+	return f'<sprite position="{v3(parts[0])}" texture="{parts[1].split(">")[-1]}" />';
 
 
 def ITEM(parts:list[str]) -> str: #6
@@ -56,12 +56,12 @@ def TRIGGER(parts:list[str]) -> str: #7
 
 def INTERACTABLE(parts:list[str]) -> str: #8
 	#8, INTERACTABLE, Like a button for player to use // TL coordinate, BL coordinate, BR coordinate, TR coordinate, Trigger-flag, texture.
-	return f'<interactable flag="{parts[4]}" texture="{parts[5]}"> <vertices v0="{v3(parts[0])}" v1="{v3(parts[1])}" v2="{v3(parts[2])}" v3="{v3(parts[3])}" /> </interactable>';
+	return f'<interactable flag="{parts[4]}" texture="{parts[5].split(">")[-1]}"> <vertices v0="{v3(parts[0])}" v1="{v3(parts[1])}" v2="{v3(parts[2])}" v3="{v3(parts[3])}" /> </interactable>';
 
 
 def CUBE_PATH(parts:list[str]) -> str: #9
 	#9, CUBE_PATH, Moving boxes for doors or similar // Position, Dimentions, Movement vector, Movement speed, Trigger-flag, bottom/side/top textures.
-	textures:list[str] = parts[5].split("/");
+	textures:list[str] = [x.split(">")[-1] for x in parts[5].split("/")];
 	return f'<cube-path position="{v3(parts[0])}" dimensions="{v3(parts[1])}" displacement="{v3(parts[2])}" speed="{parts[3]}" flag="{parts[4]}"> <textures low="{textures[0]}" side="{textures[1]}" top="{textures[2]}" /> </cube-path>';
 
 
@@ -72,7 +72,7 @@ def ENEMY(parts:list[str]) -> str: #A|10
 
 def CUBE_PHYSICS(parts:list[str]) -> str: #B|11
 	#B, CUBE_PHYSICS, Such as a box // Position, Dimentions, bottom/side/top textures.
-	textures:list[str] = parts[3].split("/");
+	textures:list[str] = [x.split(">")[-1] for x in parts[3].split("/")];
 	return f'<cube-physics position="{v3(parts[0])}" dimensions="{v3(parts[1])}" mass="{parts[2]}"> <textures low="{textures[0]}" side="{textures[1]}" top="{textures[2]}" /> </cube-physics>';
 
 

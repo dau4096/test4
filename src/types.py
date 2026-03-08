@@ -83,11 +83,6 @@ class Player:
 
 
 
-class Scene:
-	def __init__(self):
-		pass; #TBA
-
-
 
 def getTextures(XML:ET.Element) -> dict[str,str]:
 	for node in XML:
@@ -112,14 +107,14 @@ def getCuboidVerticesIndices(position:glm.vec3, dimensions:glm.vec3) -> tuple[li
 		#Lower vertices
 		glm.vec3(-1.0, -1.0, -1.0),
 		glm.vec3( 1.0, -1.0, -1.0),
-		glm.vec3(-1.0,  1.0, -1.0),
 		glm.vec3( 1.0,  1.0, -1.0),
+		glm.vec3(-1.0,  1.0, -1.0),
 
 		#Upper vertices
 		glm.vec3(-1.0, -1.0,  1.0),
 		glm.vec3( 1.0, -1.0,  1.0),
+		glm.vec3( 1.0,  1.0,  1.0),
 		glm.vec3(-1.0,  1.0,  1.0),
-		glm.vec3( 1.0,  1.0,  1.0)
 	];
 
 	for i in range(8): #Scale, then translate the vertices.
@@ -134,14 +129,14 @@ def getCuboidVerticesIndices(position:glm.vec3, dimensions:glm.vec3) -> tuple[li
 
 	indices:list[int] = [
 		#Horizontal faces
-		0,1,2, 1,2,3, #Lower face
-		4,5,6, 5,6,7, #Upper face
+		0,1,2, 2,3,0, #Lower face
+		4,5,6, 6,7,4, #Upper face
 
 		#Vertical faces
-		0,2,6, 0,4,6,
-		2,3,7, 2,6,7,
-		3,1,5, 3,5,7,
-		1,0,4, 1,5,4,
+		0,1,5, 5,4,0,
+		1,2,6, 6,5,1,
+		2,3,7, 7,6,2,
+		3,0,4, 4,7,3,
 	];
 
 	return (vertices, indices);
@@ -253,13 +248,13 @@ class CubePhysics(Dynamic):
 
 class Interactable(Dynamic):
 	def __init__(self, vertices:list[glm.vec3], texture:str, flag:str):
-		super().__init__(type(self), glm.vec3(0.0, 0.0, 0.0), vertices, [0,1,2, 1,2,3], texture);
+		super().__init__(type(self), glm.vec3(0.0, 0.0, 0.0), vertices, [0,1,2, 1,2,3], {"main": texture,});
 		self.flag:str = flag;
 	
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
 		attr:dict[str,str] = XML.attrib;
-		return cls(getVertices(XML), {"main": attr["texture"],}, attr["flag"]);
+		return cls(getVertices(XML), attr["texture"], attr["flag"]);
 
 	def update(self):
 		#Custom update to check for player press.
@@ -344,9 +339,9 @@ class Static:
 
 
 class CubeStatic(Static):
-	def __init__(self, position:glm.vec3, dimensions:glm.vec3, texture:str, collision:bool):
+	def __init__(self, position:glm.vec3, dimensions:glm.vec3, textures:list[str], collision:bool):
 		(vertices, indices) = getCuboidVerticesIndices(position, dimensions);
-		super().__init__(type(self), vertices, indices, {"main": texture,}, collision);
+		super().__init__(type(self), vertices, indices, textures, collision);
 	
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
@@ -366,7 +361,7 @@ class Tri(Static):
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
 		attr:dict[str,str] = XML.attrib;
-		return cls(getVertices(XML), {"main": attr["texture"],}, toBool(attr["collision"]));
+		return cls(getVertices(XML), attr["texture"], toBool(attr["collision"]));
 
 	def __contains__(self, other:type[Dynamic]) -> Intersection:
 		#`if (dynamic in static): ...`
@@ -381,7 +376,7 @@ class Quad(Static):
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
 		attr:dict[str,str] = XML.attrib;
-		return cls(getVertices(XML), {"main": attr["texture"],}, toBool(attr["collision"]));
+		return cls(getVertices(XML), attr["texture"], toBool(attr["collision"]));
 
 	def __contains__(self, other:type[Dynamic]) -> Intersection:
 		#`if (dynamic in static): ...`
