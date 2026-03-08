@@ -117,10 +117,11 @@ def getCuboidVerticesIndices(position:glm.vec3, dimensions:glm.vec3) -> tuple[li
 		glm.vec3(-1.0,  1.0,  1.0),
 	];
 
+	scale:glm.vec3 = dimensions * 0.5;
 	for i in range(8): #Scale, then translate the vertices.
-		vertices[i].x *= dimensions.x;
-		vertices[i].y *= dimensions.y;
-		vertices[i].z *= dimensions.z;
+		vertices[i].x *= scale.x;
+		vertices[i].y *= scale.y;
+		vertices[i].z *= scale.z;
 
 		vertices[i].x += position.x;
 		vertices[i].y += position.y;
@@ -177,7 +178,7 @@ class Dynamic:
 	@classmethod 
 	def fromXML(cls, XML:ET.Element): raise NotImplementedError(f"{cls.__name__}.fromXML() method was not implemented.");
 
-	def update(self):
+	def update(self, player:Player):
 		#Update by 1 physics tick.
 		self.velocity.z -= C.GRAVITY_ACCEL;
 		self.velocity *= C.AIR_DRAG;
@@ -185,9 +186,36 @@ class Dynamic:
 
 
 
+def getSpriteVertices(sPos:glm.vec3, sDim:glm.vec2, pPos:glm.vec3) -> list[glm.vec3]:
+	delta:glm.vec3 = sPos - pPos;
+	right:glm.vec2 = glm.normalize(glm.vec2(-delta.y, delta.x));
+	left:glm.vec2 = -right;
+	vertices:list[glm.vec3] = [
+		#Lower verts
+		glm.vec3(right.x, right.y, 0.0),
+		glm.vec3( left.x,  left.y, 0.0),
+
+		#Upper verts
+		glm.vec3( left.x,  left.y, sDim.y),
+		glm.vec3(right.x, right.y, sDim.y),
+	];
+
+	scale:glm.vec2 = sDim / 2.0;
+	for v in vertices:
+		#Width must be halved.
+		v.x *= scale.x;
+		v.y *= scale.x;
+
+		#Translation
+		v += sPos;
+
+	return vertices;
+
+
 class Sprite(Dynamic):
 	def __init__(self, position:glm.vec3, dimensions:glm.vec2, texture:str):
-		super().__init__(type(self), position, [], [0,1,2, 1,2,3], {"main": texture,});
+		super().__init__(type(self), position, [], [0,1,2, 2,3,0], {"main": texture,});
+		self.dimensions:glm.vec2 = dimensions;
 
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
@@ -195,15 +223,15 @@ class Sprite(Dynamic):
 		dim:glm.vec2 = glm.vec2(1.0, 1.0) if ("dimensions" not in attr) else vec2(attr["dimensions"]);
 		return cls(vec3(attr["position"]), dim, attr["texture"]);
 
-	def update(self):
+	def update(self, player:Player):
 		#Overload to update sprite billboarding.
-		pass; #TBA
+		self.vertices = getSpriteVertices(self.position, self.dimensions, player.position);
 
 
 
 class Item(Sprite):
 	def __init__(self, position:glm.vec3, type:str):
-		super().__init__(position, glm.vec2(1.0, 1.0), "texture TBA");
+		super().__init__(position, glm.vec2(1.0, 1.0), "00"); #Texture TBA
 		self.type = type;
 
 	@classmethod
@@ -211,15 +239,19 @@ class Item(Sprite):
 		attr:dict[str,str] = XML.attrib;
 		return cls(vec3(attr["position"]), attr["type"]);
 
-	def update(self):
-		#Overload to update sprite billboarding.
-		pass; #TBA
+	def update(self, player:Player):
+		#Overload to update sprite billboarding, and check if should be collected.
+		self.velocity.z -= C.GRAVITY_ACCEL;
+		self.velocity *= C.AIR_DRAG;
+		self.position += self.velocity;
+
+		self.vertices = getSpriteVertices(self.position, self.dimensions, player.position);
 
 
 
 class Enemy(Sprite):
 	def __init__(self, position:glm.vec3, type:str):
-		super().__init__(position, glm.vec2(1.0, 1.0), "texture TBA");
+		super().__init__(position, glm.vec2(1.0, 1.0), "00"); #Texture TBA
 		self.type = type;
 
 	@classmethod
@@ -227,9 +259,13 @@ class Enemy(Sprite):
 		attr:dict[str,str] = XML.attrib;
 		return cls(vec3(attr["position"]), attr["type"]);
 
-	def update(self):
+	def update(self, player:Player):
 		#Overload to update sprite billboarding & player interaction.
-		pass; #TBA
+		self.velocity.z -= C.GRAVITY_ACCEL;
+		self.velocity *= C.AIR_DRAG;
+		self.position += self.velocity;
+
+		self.vertices = getSpriteVertices(self.position, self.dimensions, player.position);
 
 
 
@@ -238,17 +274,26 @@ class CubePhysics(Dynamic):
 		(vertices, indices) = getCuboidVerticesIndices(position, dimensions);
 		super().__init__(type(self), position, vertices, indices, textures);
 		self.mass:float = mass;
+		self.dimensions = dimensions;
 
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
 		attr:dict[str,str] = XML.attrib;
 		return cls(vec3(attr["position"]), vec3(attr["dimensions"]), getTextures(XML), float(attr["mass"]));
 
+	def update(self, player:Player):
+		#Update by 1 physics tick.
+		self.velocity.z -= C.GRAVITY_ACCEL;
+		self.velocity *= C.AIR_DRAG;
+		self.position += self.velocity;
+		
+		(self.vertices, _) = getCuboidVerticesIndices(self.position, self.dimensions);
+
 
 
 class Interactable(Dynamic):
 	def __init__(self, vertices:list[glm.vec3], texture:str, flag:str):
-		super().__init__(type(self), glm.vec3(0.0, 0.0, 0.0), vertices, [0,1,2, 1,2,3], {"main": texture,});
+		super().__init__(type(self), glm.vec3(0.0, 0.0, 0.0), vertices, [0,1,2, 2,3,0], {"main": texture,});
 		self.flag:str = flag;
 	
 	@classmethod
@@ -256,7 +301,7 @@ class Interactable(Dynamic):
 		attr:dict[str,str] = XML.attrib;
 		return cls(getVertices(XML), attr["texture"], attr["flag"]);
 
-	def update(self):
+	def update(self, player:Player):
 		#Custom update to check for player press.
 		pass; #TBA
 
@@ -273,7 +318,7 @@ class Trigger(Dynamic):
 		attr:dict[str,str] = XML.attrib;
 		return cls(vec3(attr["position"]), vec3(attr["dimensions"]), attr["flag"]);
 
-	def update(self):
+	def update(self, player:Player):
 		#Checks if player is inside and sets the flag.
 		pass; #TBA
 
@@ -293,7 +338,7 @@ class CubePath(Dynamic):
 		attr:dict[str,str] = XML.attrib;
 		return cls(vec3(attr["position"]), vec3(attr["dimensions"]), getTextures(XML), vec3(attr["displacement"]), float(attr["speed"]), attr["flag"]);
 
-	def update(self):
+	def update(self, player:Player):
 		#Updates to check if flag is enabled, and move if so.
 		pass; #TBA
 ######## DYNAMIC TYPES ########

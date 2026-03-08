@@ -25,4 +25,10 @@ def updateLogic(logicGates:list[G.LogicGate]) -> list[G.LogicGate]:
 
 def updatePhysics(dynamic:list[T.Dynamic], player:T.Player) -> tuple[list[T.Dynamic], T.Player]:
 	#Takes in and updates the dynamic objects & the player.
-	return (dynamic, player); #TBA
+	newDynamic:list[T.Dynamic] = dynamic;
+	newPlayer:T.Player = player;
+
+	for object in newDynamic:
+		object.update(player);
+
+	return (newDynamic, newPlayer); #TBA

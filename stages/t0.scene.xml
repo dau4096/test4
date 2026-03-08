@@ -79,7 +79,7 @@
     
     <!-- Physics Object testing. -->
     <enemy position="-5, 4, 1" direction="-10, 0, 0" type="test" />
-    <sprite position="-5, 3, -1" texture="1, 1, 1" />
+    <sprite position="-5, 3, -1" dimensions="1, 1, 1" texture="05" />
     <cube-physics position="-5, 5, 1" dimensions="0.35, 0.35, 1.5" mass="10.0"> <textures low="17" side="17" top="17" /> </cube-physics>
     <cube-physics position="-5, 5.5, 1" dimensions="0.35, 0.35, 0.75" mass="10.0"> <textures low="17" side="17" top="17" /> </cube-physics>
     

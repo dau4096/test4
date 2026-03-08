@@ -10,6 +10,10 @@ def v3(v:str) -> str:
 	parts:list[str] = v.split(", ");
 	partsFixed = [parts[0], parts[2], parts[1]];
 	return ", ".join(partsFixed);
+def v2(v:str) -> str:
+	#Swap from 3D dimensions to 2D.
+	parts:list[str] = v.split(", ");
+	return ", ".join(parts[:-1])
 
 
 ######## FORMATTING FUNCS ########
@@ -41,7 +45,7 @@ def TRI(parts:list[str]) -> str: #4
 
 def SPRITE_STATIC(parts:list[str]) -> str: #5
 	#5, SPRITE_STATIC, decoration // Centre location, texture.
-	return f'<sprite position="{v3(parts[0])}" texture="{parts[1].split(">")[-1]}" />';
+	return f'<sprite position="{v3(parts[0])}" dimensions=\"{v2(parts[1])}\" texture="{parts[2].split(">")[-1]}" />';
 
 
 def ITEM(parts:list[str]) -> str: #6

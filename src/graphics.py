@@ -25,6 +25,10 @@ projMat = glm.mat4(0.0);
 modlMat = glm.mat4(0.0);
 
 
+
+
+
+
 def init(cameraID:int) -> None:
 	#Initialise values, matrices, textures and shaders.
 	global projMat, modlMat;
@@ -41,7 +45,7 @@ def init(cameraID:int) -> None:
 	gl.add_texture(shaders["environment"], textures[C.ENV_TEXTURE_SHEET], 0);
 
 
-	for (i, texName) in enumerate(("hostiles", "sprites", "transparent")): #T.Dynamic texture sets.
+	for (i, texName) in enumerate((C.ENV_TEXTURE_SHEET, "hostiles", "sprites", "transparent")): #T.Dynamic texture sets.
 		if (texName not in textures.keys()):
 			textures[texName] = gl.load_texture(f"textures/{texName}.sheet.png", texName);
 		gl.add_texture(shaders["dynamic"], textures[texName], i);
@@ -50,7 +54,11 @@ def init(cameraID:int) -> None:
 
 
 
+
+
+CACHE:dict[str, tuple[float,float]] = {}; #Cache the pre-calculated UVs.
 def getUV(object:[T.Static|T.Dynamic], triIdx:int, vIdx:int) -> tuple[float, float]:
+	global CACHE;
 	texStr:str = "00"; #String rep, [00] → (0, 0) / [F0] → (15, 0) / HEX
 	uvIdx:int = (0,1,2, 2,3,0)[vIdx%6];
 
@@ -69,20 +77,30 @@ def getUV(object:[T.Static|T.Dynamic], triIdx:int, vIdx:int) -> tuple[float, flo
 		texStr = "00"; #Unknown, just use some default [00]/(0, 0) UV.\
 
 
+	key:int = (vIdx << 8) | int(texStr, 16);
+	if (key in CACHE): return CACHE[key]; #Skip recalc, already prepped for this face/texture.
+
+
 	#Convert string rep into int rep.
 	texID:glm.ivec2 = glm.ivec2(
 		int(texStr[1], 16), int(texStr[0], 16)
 	);
 
 	#16x16 textures per sheet.
-	LOW:glm.vec2  = glm.vec2(texID) / 16.0;
-	HIGH:glm.vec2 = glm.vec2(texID + 1) / 16.0;
-	return (
-		(LOW.x,  1.0-LOW.y),
-		(HIGH.x, 1.0-LOW.y),
-		(HIGH.x, 1.0-HIGH.y),
+	OFFSET:float = 1.0 / (16.0 * 128); #1 pixel, in a 16 texture grid (Each texture is 128x128)
+	LOW:glm.vec2  = (glm.vec2(texID) / 16.0) + OFFSET;
+	HIGH:glm.vec2 = (glm.vec2(texID + 1) / 16.0) - OFFSET;
+	UV:tuple[float,float] = (
 		(LOW.x,  1.0-HIGH.y),
+		(HIGH.x, 1.0-HIGH.y),
+		(HIGH.x, 1.0-LOW.y),
+		(LOW.x,  1.0-LOW.y),
 	)[uvIdx];
+	CACHE[key] = UV;
+	return UV;
+
+
+
 
 
 def addEnvironment(environment:list[T.Static]) -> None:
@@ -113,9 +131,37 @@ def addEnvironment(environment:list[T.Static]) -> None:
 
 
 
+
+
 def updateDynamic(dynamic:list[T.Dynamic]) -> None:
 	#Update the VAO of dynamic objects.
-	pass; #TBA
+	vertices:list[float] = [];
+	indices:list[int] = [];
+	base:int = 0;
+
+	for object in dynamic:
+		if (type(object) == T.Trigger): continue; #Should not be rendered.
+
+		triIdx = 0;
+		for t in range(
+			0, len(object.indices), 3
+		): #Process triangles
+			for i in range(3):
+				vIDX = object.indices[t+i];
+				V = object.vertices[vIDX];
+
+				vertices.extend(list(V)); #X/Y/Z
+				vertices.extend(getUV(object, triIdx, i + (3*triIdx))); #U/V
+
+			triIdx += 1;
+			indices.extend([base, base+1, base+2]);
+			base += 3;
+
+	gl.add_vao(shaders["dynamic"], gl.POS_UV2D, vertices, indices);
+
+
+
+
 
 
 
@@ -128,3 +174,7 @@ def drawFrame(player:T.Player) -> None:
 	#Draw environment triangles
 	gl.add_uniform_value(shaders["environment"], "pvmMatrix", pvmMatrix);
 	gl.run(shaders["environment"]);
+
+	#Draw dynamic object triangles
+	gl.add_uniform_value(shaders["dynamic"], "pvmMatrix", pvmMatrix);
+	gl.run(shaders["dynamic"]);
