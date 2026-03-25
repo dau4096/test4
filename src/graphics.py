@@ -57,22 +57,22 @@ def init(cameraID:int) -> None:
 
 
 CACHE:dict[str, tuple[float,float]] = {}; #Cache the pre-calculated UVs.
-def getUV(object:[T.Static|T.Dynamic], triIdx:int, vIdx:int) -> tuple[float, float]:
+def getUV(obj:[T.Static|T.Dynamic], triIdx:int, vIdx:int) -> tuple[float, float]:
 	global CACHE;
 	texStr:str = "00"; #String rep, [00] → (0, 0) / [F0] → (15, 0) / HEX
 	uvIdx:int = (0,1,2, 2,3,0)[vIdx%6];
 
-	if (type(object) in (
+	if (isinstance(obj, (
 		T.Quad, T.Tri, T.Sprite, T.Item,
-	)): #Objects with 1 texture ("main")
-		texStr = object.textures["main"];
-	elif (type(object) in (
+	))): #Objects with 1 texture ("main")
+		texStr = obj.textures["main"];
+	elif (isinstance(obj, (
 		T.CubeStatic, T.CubePath, T.CubePhysics,
-	)): #Object with 3 textures ("low", "side", "top")
+	))): #Object with 3 textures ("low", "side", "top")
 		texName:str = "side";
 		if (triIdx<2): texName = "low";
 		elif (triIdx<4): texName = "top";
-		texStr = object.textures[texName];
+		texStr = obj.textures[texName];
 	else:
 		texStr = "00"; #Unknown, just use some default [00]/(0, 0) UV.\
 
@@ -87,7 +87,7 @@ def getUV(object:[T.Static|T.Dynamic], triIdx:int, vIdx:int) -> tuple[float, flo
 	);
 
 	#16x16 textures per sheet.
-	OFFSET:float = 1.0 / (16.0 * 128); #1 pixel, in a 16 texture grid (Each texture is 128x128)
+	OFFSET:float = 0.0;#1.0 / (16.0 * 128); #1 pixel, in a 16 texture grid (Each texture is 128x128)
 	LOW:glm.vec2  = (glm.vec2(texID) / 16.0) + OFFSET;
 	HIGH:glm.vec2 = (glm.vec2(texID + 1) / 16.0) - OFFSET;
 	UV:tuple[float,float] = (
@@ -108,19 +108,19 @@ def addEnvironment(environment:list[T.Static]) -> None:
 	indices:list[int] = [];
 	base:int = 0;
 
-	for object in environment:
-		if (type(object) == T.Light): continue; #No mesh to draw.
+	for obj in environment:
+		if (type(obj) == T.Light): continue; #No mesh to draw.
 
 		triIdx = 0;
 		for t in range(
-			0, len(object.indices), 3
+			0, len(obj.indices), 3
 		): #Process triangles
 			for i in range(3):
-				vIDX = object.indices[t+i];
-				V = object.vertices[vIDX];
+				vIDX = obj.indices[t+i];
+				V = obj.vertices[vIDX];
 
 				vertices.extend(list(V)); #X/Y/Z
-				vertices.extend(getUV(object, triIdx, i + (3*triIdx))); #U/V
+				vertices.extend(getUV(obj, triIdx, i + (3*triIdx))); #U/V
 
 			triIdx += 1;
 			indices.extend([base, base+1, base+2]);
@@ -134,24 +134,24 @@ def addEnvironment(environment:list[T.Static]) -> None:
 
 
 def updateDynamic(dynamic:list[T.Dynamic]) -> None:
-	#Update the VAO of dynamic objects.
+	#Update the VAO of dynamic objs.
 	vertices:list[float] = [];
 	indices:list[int] = [];
 	base:int = 0;
 
-	for object in dynamic:
-		if (type(object) == T.Trigger): continue; #Should not be rendered.
+	for obj in dynamic:
+		if (isinstance(obj, T.Trigger)): continue; #Should not be rendered.
 
 		triIdx = 0;
 		for t in range(
-			0, len(object.indices), 3
+			0, len(obj.indices), 3
 		): #Process triangles
 			for i in range(3):
-				vIDX = object.indices[t+i];
-				V = object.vertices[vIDX];
+				vIDX = obj.indices[t+i];
+				V = obj.vertices[vIDX];
 
 				vertices.extend(list(V)); #X/Y/Z
-				vertices.extend(getUV(object, triIdx, i + (3*triIdx))); #U/V
+				vertices.extend(getUV(obj, triIdx, i + (3*triIdx))); #U/V
 
 			triIdx += 1;
 			indices.extend([base, base+1, base+2]);
@@ -167,7 +167,7 @@ def updateDynamic(dynamic:list[T.Dynamic]) -> None:
 
 
 def drawFrame(player:T.Player) -> None:
-	#Draw environmental & dynamic objects.
+	#Draw environmental & dynamic objs.
 	viewMat:glm.mat4 = player.getViewMatrix();
 	pvmMatrix:glm.mat4 = projMat * viewMat * modlMat;
 
@@ -175,6 +175,6 @@ def drawFrame(player:T.Player) -> None:
 	gl.add_uniform_value(shaders["environment"], "pvmMatrix", pvmMatrix);
 	gl.run(shaders["environment"]);
 
-	#Draw dynamic object triangles
+	#Draw dynamic obj triangles
 	gl.add_uniform_value(shaders["dynamic"], "pvmMatrix", pvmMatrix);
 	gl.run(shaders["dynamic"]);

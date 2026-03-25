@@ -14,11 +14,6 @@ else:
 	from src import constants as C;
 
 
-@dataclass
-class Intersection:
-	isIntersecting:bool;
-	distance:float;
-	direction:glm.vec3;
 
 
 def toBool(v:str) -> bool: return v.lower() in ("t", "true");
@@ -26,6 +21,23 @@ def vec2(v:str) -> glm.vec2: return glm.vec2([float(x) for x in v.split(",")][:2
 def vec3(v:str) -> glm.vec3: return glm.vec3([float(x) for x in v.split(",")][:3]);
 
 
+
+@dataclass
+class BoundingBox:
+	minimum:glm.vec3 = glm.vec3( C.INF,  C.INF,  C.INF);
+	maximum:glm.vec3 = glm.vec3(-C.INF, -C.INF, -C.INF);
+	centre:glm.vec3 = glm.vec3(0.0, 0.0, 0.0);
+	halfDimensions:glm.vec3 = glm.vec3(0.0, 0.0, 0.0);
+
+	def update(self, V:glm.vec3) -> None:
+		self.minimum = glm.min(self.minimum, V);
+		self.maximum = glm.max(self.maximum, V);
+		self.halfDimensions = (self.maximum - self.minimum) / 2.0;
+		self.centre = self.minimum + self.halfDimensions;
+
+	def __repr__(self) -> str:
+		return f"<BoundingBox [Min: {self.minimum}, Max: {self.maximum}, Centre: {self.centre}, HalfDim: {self.halfDimensions}]>";
+		
 
 #Player/Meta
 @dataclass
@@ -82,6 +94,17 @@ class Player:
 		return f"<Player [CameraID: {self.cameraID},    Pos: {tuple(self.position)},    Ang: {tuple(self.angle)}]>";
 
 
+	def getBoundingBox(self) -> BoundingBox:
+		BB:BoundingBox = BoundingBox();
+		offset:glm.vec3 = C.PLAYER_BB_DIMENSIONS / 2.0;
+		BB.minimum = self.position - offset;
+		BB.maximum = self.position + offset;
+		BB.centre = self.position;
+		BB.halfDimensions = offset;
+		return BB;
+
+
+
 
 
 def getTextures(XML:ET.Element) -> dict[str,str]:
@@ -95,7 +118,7 @@ def getTextures(XML:ET.Element) -> dict[str,str]:
 def getVertices(XML:ET.Element) -> list[glm.vec3]:
 	for node in XML:
 		if (node.tag == "vertices"):
-			#<objecttag attribs=""> <vertices v0="{v[0]}" v1="{v[1]}" ... vN="{v[N]}" /> </objecttag>
+			#<objecttag attribs=""> <vertices verts[0]="{v[0]}" verts[1]="{v[1]}" ... vN="{v[N]}" /> </objecttag>
 			return [vec3(x) for x in node.attrib.values()];
 
 	return [];
@@ -159,8 +182,6 @@ def getCuboidVerticesIndices(position:glm.vec3, dimensions:glm.vec3) -> tuple[li
 
 
 
-
-
 ######## DYNAMIC TYPES ########
 #Parent class for all dynamic object types. [Physics]
 class Dynamic:
@@ -184,6 +205,11 @@ class Dynamic:
 		self.velocity *= C.AIR_DRAG;
 		self.position += self.velocity;
 
+	def getBoundingBox(self) -> BoundingBox:
+		BB:BoundingBox = BoundingBox();
+		for V in self.vertices:	BB.update(V);
+		return BB;
+
 
 
 def getSpriteVertices(sPos:glm.vec3, sDim:glm.vec2, pPos:glm.vec3) -> list[glm.vec3]:
@@ -192,12 +218,12 @@ def getSpriteVertices(sPos:glm.vec3, sDim:glm.vec2, pPos:glm.vec3) -> list[glm.v
 	left:glm.vec2 = -right;
 	vertices:list[glm.vec3] = [
 		#Lower verts
-		glm.vec3(right.x, right.y, 0.0),
-		glm.vec3( left.x,  left.y, 0.0),
+		glm.vec3(right.x, right.y, -1.0),
+		glm.vec3( left.x,  left.y, -1.0),
 
 		#Upper verts
-		glm.vec3( left.x,  left.y, sDim.y),
-		glm.vec3(right.x, right.y, sDim.y),
+		glm.vec3( left.x,  left.y,  1.0),
+		glm.vec3(right.x, right.y,  1.0),
 	];
 
 	scale:glm.vec2 = sDim / 2.0;
@@ -205,6 +231,7 @@ def getSpriteVertices(sPos:glm.vec3, sDim:glm.vec2, pPos:glm.vec3) -> list[glm.v
 		#Width must be halved.
 		v.x *= scale.x;
 		v.y *= scale.x;
+		v.z *= scale.y;
 
 		#Translation
 		v += sPos;
@@ -228,6 +255,16 @@ class Sprite(Dynamic):
 		self.vertices = getSpriteVertices(self.position, self.dimensions, player.position);
 
 
+	def getBoundingBox(self) -> BoundingBox:
+		BB:BoundingBox = BoundingBox();
+		offset:glm.vec3 = glm.vec3(self.dimensions.x, self.dimensions.x, self.dimensions.y) / 2.0;
+		BB.minimum = self.position - offset;
+		BB.maximum = self.position + offset;
+		BB.centre = self.position;
+		BB.halfDimensions = offset;
+		return BB;
+
+
 
 class Item(Sprite):
 	def __init__(self, position:glm.vec3, type:str):
@@ -241,11 +278,17 @@ class Item(Sprite):
 
 	def update(self, player:Player):
 		#Overload to update sprite billboarding, and check if should be collected.
-		self.velocity.z -= C.GRAVITY_ACCEL;
-		self.velocity *= C.AIR_DRAG;
-		self.position += self.velocity;
-
 		self.vertices = getSpriteVertices(self.position, self.dimensions, player.position);
+
+
+	def getBoundingBox(self) -> BoundingBox:
+		BB:BoundingBox = BoundingBox();
+		offset:glm.vec3 = glm.vec3(self.dimensions.x, self.dimensions.x, self.dimensions.y) / 2.0;
+		BB.minimum = self.position - offset;
+		BB.maximum = self.position + offset;
+		BB.centre = self.position;
+		BB.halfDimensions = offset;
+		return BB;
 
 
 
@@ -261,11 +304,16 @@ class Enemy(Sprite):
 
 	def update(self, player:Player):
 		#Overload to update sprite billboarding & player interaction.
-		self.velocity.z -= C.GRAVITY_ACCEL;
-		self.velocity *= C.AIR_DRAG;
-		self.position += self.velocity;
-
 		self.vertices = getSpriteVertices(self.position, self.dimensions, player.position);
+
+
+	def getBoundingBox(self) -> BoundingBox:
+		BB:BoundingBox = BoundingBox();
+		BB.halfDimensions = glm.vec3(self.dimensions.x, self.dimensions.x, self.dimensions.y) / 2.0;
+		BB.minimum = self.position - BB.halfDimensions;
+		BB.maximum = self.position + BB.halfDimensions;
+		BB.centre = self.position;
+		return BB;
 
 
 
@@ -282,12 +330,18 @@ class CubePhysics(Dynamic):
 		return cls(vec3(attr["position"]), vec3(attr["dimensions"]), getTextures(XML), float(attr["mass"]));
 
 	def update(self, player:Player):
-		#Update by 1 physics tick.
-		self.velocity.z -= C.GRAVITY_ACCEL;
-		self.velocity *= C.AIR_DRAG;
-		self.position += self.velocity;
-		
+		#Update the cube vertices.
 		(self.vertices, _) = getCuboidVerticesIndices(self.position, self.dimensions);
+
+
+	def getBoundingBox(self) -> BoundingBox:
+		BB:BoundingBox = BoundingBox();
+		BB.halfDimensions = self.dimensions / 2.0;
+		BB.centre = self.position;
+		#BB.centre.z += self.dimensions.z * 0.5;
+		BB.minimum = BB.centre - BB.halfDimensions;
+		BB.maximum = BB.centre + BB.halfDimensions;
+		return BB;
 
 
 
@@ -364,6 +418,87 @@ class CubePath(Dynamic):
 
 
 
+@dataclass
+class Intersection:
+	isIntersecting:bool = False;				  #Is it intersecting
+	intersect:glm.vec3 = glm.vec3(0.0, 0.0, 0.0); #Delta that it's intersecting by.
+
+
+def AABBintersect(a:BoundingBox, b:BoundingBox) -> bool:
+	return not (
+		((a.maximum.x < b.minimum.x) or (a.minimum.x > b.maximum.x)) or	#X
+		((a.maximum.y < b.minimum.y) or (a.minimum.y > b.maximum.y)) or	#Y
+		((a.maximum.z < b.minimum.z) or (a.minimum.z > b.maximum.z))	#Z
+	);
+
+
+def SATtri(triPts:list[glm.vec3], BB:BoundingBox) -> Intersection:
+	#Centre on BB centre.
+	verts:list[glm.vec3] = [pt - BB.centre for pt in triPts];
+
+	#Edges
+	edges:list[glm.vec3] = [verts[(i+1)%3] - verts[i] for i in range(3)];
+
+	def axisTestX(edge:glm.vec3):
+		pt0:float = verts[0].z*edge.y - verts[0].y*edge.z;
+		pt1:float = verts[1].z*edge.y - verts[1].y*edge.z;
+		pt2:float = verts[2].z*edge.y - verts[2].y*edge.z;
+		r:float = BB.halfDimensions.y*abs(edge.z) + BB.halfDimensions.z*abs(edge.y);
+		return not ((max(pt0, pt1, pt2) < -r) or (min(pt0, pt1, pt2) > r));
+
+	def axisTestY(edge:glm.vec3):
+		pt0:float = verts[0].x*edge.z - verts[0].z*edge.x;
+		pt1:float = verts[1].x*edge.z - verts[1].z*edge.x;
+		pt2:float = verts[2].x*edge.z - verts[2].z*edge.x;
+		r:float = BB.halfDimensions.x*abs(edge.z) + BB.halfDimensions.z*abs(edge.x);
+		return not ((max(pt0, pt1, pt2) < -r) or (min(pt0, pt1, pt2) > r));
+
+	def axisTestZ(edge:glm.vec3):
+		pt0:float = verts[0].y*edge.x - verts[0].x*edge.y;
+		pt1:float = verts[1].y*edge.x - verts[1].x*edge.y;
+		pt2:float = verts[2].y*edge.x - verts[2].x*edge.y;
+		r:float = BB.halfDimensions.x*abs(edge.y) + BB.halfDimensions.y*abs(edge.x);
+		return not ((max(pt0, pt1, pt2) < -r) or (min(pt0, pt1, pt2) > r));
+
+
+	#Check each edge.
+	if any([
+		not (
+			axisTestX(edge) and	axisTestY(edge) and	axisTestZ(edge)
+		) for edge in edges
+	]): return Intersection(False);
+
+
+	#Check the AABB axis.
+	if (
+		((max(v.x for v in verts) < -BB.halfDimensions.x) or (min(v.x for v in verts) > BB.halfDimensions.x)) or #X
+		((max(v.y for v in verts) < -BB.halfDimensions.y) or (min(v.y for v in verts) > BB.halfDimensions.y)) or #Y
+		((max(v.z for v in verts) < -BB.halfDimensions.z) or (min(v.z for v in verts) > BB.halfDimensions.z))	   #Z
+	): return Intersection(False)
+
+
+	#Check tri plane.
+	normal:glm.vec3 = glm.cross(edges[0], edges[1]);
+	r:float = (
+		BB.halfDimensions.x * abs(normal.x) +
+		BB.halfDimensions.y * abs(normal.y) +
+		BB.halfDimensions.z * abs(normal.z)
+	);
+	d:float = glm.dot(normal, verts[0]);
+
+
+	#Final check
+	if (abs(d) <= r):
+		#A valid intersection must have been found, return valid intersect with the offset.
+		n:glm.vec3 = glm.normalize(normal);
+		dist:float = glm.dot(n, verts[0]);
+		pene:float = BB.halfDimensions.y - dist;
+		#print(n*pene);
+		return Intersection(True, n * pene);
+
+	return Intersection(False);
+
+
 
 
 
@@ -382,21 +517,55 @@ class Static:
 	@classmethod
 	def fromXML(cls, XML:ET.Element): raise NotImplementedError(f"{cls.__name__}.fromXML() method was not implemented.");
 
+	def getBoundingBox(self) -> BoundingBox:
+		BB:BoundingBox = BoundingBox();
+		for V in self.vertices:	BB.update(V);
+		return BB;
+
 
 class CubeStatic(Static):
 	def __init__(self, position:glm.vec3, dimensions:glm.vec3, textures:list[str], collision:bool):
 		(vertices, indices) = getCuboidVerticesIndices(position, dimensions);
 		super().__init__(type(self), vertices, indices, textures, collision);
+		self.dimensions:glm.vec3 = dimensions;
 	
 	@classmethod
 	def fromXML(cls, XML:ET.Element):
 		attr:dict[str,str] = XML.attrib;
 		return cls(vec3(attr["position"]), vec3(attr["dimensions"]), getTextures(XML), toBool(attr["collision"]));
 
-	def __contains__(self, other:type[Dynamic]) -> Intersection:
-		#`if (dynamic in static): ...`
-		#AABB bounding box checks.
-		pass;
+	def intersects(self, other: BoundingBox) -> Intersection:
+		selfBB = self.getBoundingBox();
+		if (not AABBintersect(selfBB, other)): return Intersection(False); #Early-exit.
+
+		#Centres;
+		otherCentre = (other.minimum + other.maximum) * 0.5;
+
+		#Half sizes
+		selfBBHalf = self.dimensions * 0.5;
+		otherBBHalf = (other.maximum - other.minimum) * 0.5;
+
+		delta = self.position - otherCentre;
+
+		overlapX = selfBBHalf.x + otherBBHalf.x - abs(delta.x);
+		overlapY = selfBBHalf.y + otherBBHalf.y - abs(delta.y);
+		overlapZ = selfBBHalf.z + otherBBHalf.z - abs(delta.z);
+
+		# smallest penetration axis
+		if ((overlapX < overlapY) and (overlapX < overlapZ)):
+			offset = glm.vec3(
+				(overlapX if (delta.x > 0) else -overlapX), 0, 0
+			);
+		elif (overlapY < overlapZ):
+			offset = glm.vec3(
+				0, (overlapY if (delta.y > 0) else -overlapY), 0
+			);
+		else:
+			offset = glm.vec3(
+				0, 0, (overlapZ if (delta.z > 0) else -overlapZ)
+			);
+
+		return Intersection(True, offset);
 
 
 class Tri(Static):
@@ -408,10 +577,8 @@ class Tri(Static):
 		attr:dict[str,str] = XML.attrib;
 		return cls(getVertices(XML), attr["texture"], toBool(attr["collision"]));
 
-	def __contains__(self, other:type[Dynamic]) -> Intersection:
-		#`if (dynamic in static): ...`
-		#Uses Seperating Axis Theorem.
-		pass; #TBA
+	def intersects(self, other:BoundingBox) -> Intersection:
+		return SATtri(self.vertices, other);
 
 
 class Quad(Static):
@@ -423,10 +590,14 @@ class Quad(Static):
 		attr:dict[str,str] = XML.attrib;
 		return cls(getVertices(XML), attr["texture"], toBool(attr["collision"]));
 
-	def __contains__(self, other:type[Dynamic]) -> Intersection:
-		#`if (dynamic in static): ...`
-		#Uses Seperating Axis Theorem.
-		pass; #TBA
+	def intersects(self, other:BoundingBox) -> Intersection:
+		for i in range(2):
+			#Run 2 tri SATs.
+			indis:list[int] = self.indices[i*3 : (i+1)*3];
+			verts:list[glm.vec3] = [self.vertices[x] for x in indis];
+			collision:Intersection = SATtri(verts, other);
+			if (collision.isIntersecting): return collision;
+		return Intersection(False);
 
 
 class Light(Static):
@@ -447,6 +618,6 @@ class Light(Static):
 		attr:dict[str,str] = XML.attrib;
 		return cls(vec3(attr["position"]), vec3(attr["look-at"]), vec3(attr["colour"]), float(attr["intensity"]), float(attr["FOV"]), float(attr["range"]), attr["flag"]);
 
-	def __contains__(self, other:type[Dynamic]) -> Intersection:
-		return Intersection(False, 0.0, glm.vec3(0.0, 0.0, 0.0));
+	def intersects(self, other:type[Dynamic]) -> Intersection:
+		return Intersection();
 ######## STATIC TYPES ########

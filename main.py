@@ -34,8 +34,8 @@ def main() -> None:
 		stage.player.handleInputs();
 
 		#Run Physics & logic
-		stage.logicGates = P.updateLogic(stage.logicGates);
-		(stage.dynamic, stage.player) = P.updatePhysics(stage.dynamic, stage.player);
+		P.updateLogic(stage.logicGates);
+		P.updatePhysics(stage.dynamic, stage.environment, stage.player);
 
 		#Render frame.
 		R.updateDynamic(stage.dynamic); #Dynamic objects.

@@ -18,17 +18,42 @@ else:
 
 
 
-def updateLogic(logicGates:list[G.LogicGate]) -> list[G.LogicGate]:
+def updateLogic(logicGates:list[G.LogicGate]) -> None:
 	#Updates every logicGate.
 	return logicGates; #TBA
 
 
-def updatePhysics(dynamic:list[T.Dynamic], player:T.Player) -> tuple[list[T.Dynamic], T.Player]:
-	#Takes in and updates the dynamic objects & the player.
-	newDynamic:list[T.Dynamic] = dynamic;
-	newPlayer:T.Player = player;
+PHYSICS_OBJECTS:tuple[T.Dynamic] = (
+	T.Player, T.Item, T.Enemy, T.CubePhysics #All have cuboidal physics boxes.
+);
 
-	for object in newDynamic:
-		object.update(player);
+def updatePlayer(dynamic:list[T.Dynamic], environment:list[T.Static], player:T.Player) -> None:
+	#Run player physics, and such.
+	pass; #TBA
 
-	return (newDynamic, newPlayer); #TBA
+
+def updatePhysics(dynamic:list[T.Dynamic], environment:list[T.Static], player:T.Player) -> None:
+	#Takes in and updates the dynamic objs & the player.
+	for obj in dynamic:
+		if (isinstance(obj, PHYSICS_OBJECTS)):
+			#If obj should have physics simulated;
+			obj.velocity.z = -C.GRAVITY_ACCEL;
+			obj.velocity *= C.AIR_DRAG;
+			BB:T.BoundingBox = obj.getBoundingBox();
+
+			for env in environment:
+				#Check AABB collision against each env object;
+				collision:T.Intersection = env.intersects(BB);
+				if (collision.isIntersecting):
+					#Fix this collision.
+					if (collision.intersect.z > 0.1): print(collision.intersect, obj.position);
+					obj.position -= collision.intersect;
+					obj.velocity = glm.vec3(0.0, 0.0, 0.0); #Zero the v for now. Will replace with something more sophisticated later.
+			
+			obj.position += obj.velocity;
+					
+
+		#Update every obj.
+		obj.update(player);
+
+	updatePlayer(dynamic, environment, player);
